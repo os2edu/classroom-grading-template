@@ -1,0 +1,23 @@
+{
+    "org": "learn-node",
+    "classrooms": [
+        {
+            "name": "grade-four",
+            "assignments": ["math-assignment-one"],
+            "studentBlacklist": []
+        },
+        {
+            "name": "四年级一班",
+            "assignments": ["ke-tang-zuo-ye-yi"],
+            "studentBlacklist": []
+        },
+        {
+            "name": "六年级一班",
+            "assignments": ["exercise-reading"],
+            "studentBlacklist": []
+        }
+    ],
+    "website": {
+        "title": "网站名称"
+    }
+}

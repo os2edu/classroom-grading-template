@@ -1,0 +1,63 @@
+{
+  "name": "auto-grading",
+  "homepage": "./",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/lodash": "^4.14.182",
+    "@types/node": "^16.11.42",
+    "@types/react": "^18.0.14",
+    "@types/react-dom": "^18.0.5",
+    "antd": "^4.21.4",
+    "dayjs": "^1.11.3",
+    "lodash": "^4.17.21",
+    "mobile-detect": "^1.4.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "setup": "node ./scripts/updateClassroomData",
+    "start": "craco start",
+    "build": "rm -rf docs && craco build && mv build docs",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+    "test": "craco test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@actions/core": "^1.9.0",
+    "@craco/craco": "^6.4.4",
+    "craco-antd": "^2.0.0",
+    "csv-parse": "^5.2.2",
+    "dotenv": "^16.0.1",
+    "gh-pages": "^4.0.0",
+    "less-loader": "^11.0.0",
+    "node-fetch": "2",
+    "octokit": "^2.0.3",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.7.4"
+  }
+}

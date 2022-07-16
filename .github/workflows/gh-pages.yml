@@ -1,0 +1,45 @@
+# @format
+
+name: GitHub Classroom Workflow
+
+on:
+  schedule:
+    - cron: '0 */1 * * *'
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Autograding
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: install nodejs
+        uses: actions/setup-node@v3.0.0
+        with:
+          node-version: '16.x'
+      - name: install pkg
+        run: |
+          npm install yarn -g
+          yarn install
+      - name: create env file
+        run: |
+          echo AUTH=${{ secrets.AUTH_TOKEN }} >> .env
+      - name: update classroom data
+        run: yarn setup
+      - name: save data files
+        run: |
+          git config user.name github-classroom[bot]
+          git add .
+          git commit -am "updata data"
+          git push origin main
+      - name: build pages
+        run: yarn build
+      - name: GitHub Pages
+        uses: crazy-max/ghaction-github-pages@v3.0.0
+        with:
+          target_branch: gh-pages
+          build_dir: docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
