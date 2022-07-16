@@ -2,22 +2,12 @@
     "org": "learn-node",
     "classrooms": [
         {
-            "name": "grade-four",
-            "assignments": ["math-assignment-one"],
-            "studentBlacklist": []
-        },
-        {
-            "name": "四年级一班",
-            "assignments": ["ke-tang-zuo-ye-yi"],
-            "studentBlacklist": []
-        },
-        {
-            "name": "六年级一班",
+            "name": "一年级",
             "assignments": ["exercise-reading"],
             "studentBlacklist": []
         }
     ],
     "website": {
-        "title": "网站名称"
+        "title": "2022开源操作系统训练营排行榜"
     }
 }

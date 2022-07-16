@@ -30,7 +30,7 @@ const findAssignment = (key: string): TAssignment | undefined => {
 }
 
 // const defaultSelectedAssignment = classRoom[0].assignments[0].id
-const defaultSelectedClass = data[0] ? data[0].id : ''
+const defaultSelectedClass =classroomData?.[0]?.id
 const Rank = ({ isMobile }: { isMobile?: boolean }) => {
   const navRef = React.useRef<{ changeVisible: (visible: boolean) => void }>()
   const [hideNav, setHideNav] = useState(true)

@@ -17,7 +17,6 @@ export function isMobile() {
 }
 
 function App() {
-
   const mobile = isMobile()
 
   return (
@@ -26,15 +25,11 @@ function App() {
         <div id="logo-box">
           <Icon symbol="icon-autojiangbei" id="logo" />
           <div className="logo-title">
-            <span>2022开源操作系统训练营排行榜</span>
+            <span>{websiteTitle}</span>
           </div>
         </div>
         <Contact isMobile={mobile} />
-        {mobile ? (
-          <div style={{ marginTop: 10 }} />
-        ) : (
-          <></>
-        )}
+        {mobile ? <div style={{ marginTop: 10 }} /> : <></>}
       </header>
       <Rank isMobile={mobile} />
     </div>

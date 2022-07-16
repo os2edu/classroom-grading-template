@@ -1,7 +1,0 @@
-# @format
-
-name: 'update classroom data'
-description: 'Transform data'
-runs:
-  using: 'node16'
-  main: './index.js'
