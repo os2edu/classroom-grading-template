@@ -325,7 +325,7 @@ const RankList = (props: IRankListProps) => {
     }
 
     const renderAction = (record: TStudentHomework) => {
-      const url = record.latestRunJobs?.[0].html_url
+      const url = record.latestRunJobs?.[0]?.html_url
       if (url) {
         return (
           <Icon
