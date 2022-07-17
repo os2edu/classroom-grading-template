@@ -30,46 +30,47 @@ b. 回到项目 setting 中， 把上一步获取的 **Personal access tokens** 
 
 <img src="https://user-images.githubusercontent.com/920487/179376541-0a906707-1a43-4d37-ab50-d19c8812f87b.png" alt="fork" width="600"/>
 
-[为什么需要手动打开workflow](https://github.com/laravel/framework/issues/34356#issuecomment-718831832)
+[为什么需要手动打开 workflow](https://github.com/laravel/framework/issues/34356#issuecomment-718831832)
 
 #### 4. 配置 gh-pages
 
-项目的 setting 中进行 pages 设置 
+项目的 setting 中进行 pages 设置
 
 <img src="https://user-images.githubusercontent.com/920487/179375401-0d57b303-36c9-4599-88fd-0f4d93a095cd.png" alt="fork" width="600"/>
-
 
 #### 5. 修改配置
 
 将 fork 的项目 clone 到本地，修改 **classroom.config.json**
 
-注意配置字段中 **org** 和 **assignments** 是重要字段，决定数据采集的准确性, 必须与实际信息保证一致。 
+注意配置字段中 **org** 和 **assignments** 是重要字段，决定数据采集的准确性, 必须与实际信息保证一致。
 
 <img src="https://user-images.githubusercontent.com/108247373/179375014-8f81bc75-d49e-41fe-ae53-be5c8e483e84.png" alt="config" width="400"/>
 
-#### config 字段
+#### 字段
 
-| 字段        | 描述           | 是否必填  |
-| ------------- |:-------------:| -----:|
-| org      | classroom所在组织| 是 |
-| classrooms      | 需要展示教室      |  否  |
-| website | 站点元信息      |  否   |
+| 字段       |        描述        | 是否必填 |
+| ---------- | :----------------: | -------: |
+| org        | classroom 所在组织 |       是 |
+| classrooms |        教室        |       否 |
+| website    |     站点元信息     |       否 |
 
 #### classrooms 内部字段
 
-| 字段        | 描述           | 是否必填  |
-| ------------- |:-------------:| -----:|
-| name      | 教室名称，不要求与实际信息一致，仅起展示作用| 是 |
-| assignments      | 需要展示的作业排行榜, 必须实际信息一致      |  是  |
-| studentBlacklist | 黑明单，用于过滤不展示的学生作业      |  否   |
+| 字段             |                           描述                            | 是否必填 |
+| ---------------- | :-------------------------------------------------------: | -------: |
+| name             | 必须与实际信息一致, 注意要求完整名称，包括 id，看下图说明 |       是 |
+| assignments      |         需要展示的作业排行榜, 必须与实际信息一致          |       是 |
+| studentBlacklist |            黑明单，用于过滤不参加排名的的学生             |       否 |
 
+完整的 classroom 名称:
+
+<img src="https://user-images.githubusercontent.com/108247373/179397657-f8bbc0cf-958a-4edb-bf98-477591de013f.png" alt="config" width="200"/>
 
 #### website 内部字段
 
-| 字段        | 描述           | 是否必填  |
-| ------------- |:-------------:| -----:|
-| title      | 网站logo处名称 | 否 |
-| ...      | 根据需要可后期开放 | - |
-
+| 字段  |        描述        | 是否必填 |
+| ----- | :----------------: | -------: |
+| title |  网站 logo 处名称  |       否 |
+| ...   | 根据需要可后期开放 |        - |
 
 修改完成后 push 到 main 分支, 会自动触发执行 action，等待几分钟后，便可以访问自己的排行榜页面了
