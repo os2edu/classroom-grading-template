@@ -24,19 +24,20 @@ b. 回到项目 setting 中， 把上一步获取的 **Personal access tokens** 
 
 <img src="https://user-images.githubusercontent.com/920487/179375600-8fc6102f-b7d0-40a2-a7d1-df026bbc290c.png" alt="pat" width="400"/>
 
-#### 3. 配置 gh-pages
-
-项目的 setting 中进行 pages 设置 
-
-<img src="https://user-images.githubusercontent.com/920487/179375401-0d57b303-36c9-4599-88fd-0f4d93a095cd.png" alt="fork" width="600"/>
-
-#### 4 打开 workflow 开关
+#### 3 打开 workflow 开关
 
 因为项目的 action 中有一个执行定时任务的 workflow， 需要手动开启。 该任务每小时会刷新一次排行榜数据。
 
 <img src="https://user-images.githubusercontent.com/920487/179376541-0a906707-1a43-4d37-ab50-d19c8812f87b.png" alt="fork" width="600"/>
 
 [为什么需要手动打开workflow](https://github.com/laravel/framework/issues/34356#issuecomment-718831832)
+
+#### 4. 配置 gh-pages
+
+项目的 setting 中进行 pages 设置 
+
+<img src="https://user-images.githubusercontent.com/920487/179375401-0d57b303-36c9-4599-88fd-0f4d93a095cd.png" alt="fork" width="600"/>
+
 
 #### 5. 修改配置
 
