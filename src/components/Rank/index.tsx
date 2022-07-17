@@ -15,7 +15,7 @@ const { DirectoryTree } = Tree
 
 // @ts-ignore
 const classroomData = data.classrooms as TClassroom[]
-const latest_updated_at = data.latest_updated_at
+const latestUpdatedAt = data.latest_updated_at
 
 const findClassroom = (key: string): TClassroom | undefined => {
   return classroomData.find(({ id }) => id === key)
@@ -94,7 +94,7 @@ const Rank = ({ isMobile }: { isMobile?: boolean }) => {
       )}
       <main className="rank-list">
         {isClassNode ? (
-          <ClassRankList isMobile={isMobile} classroom={findClassroom(treeNodeId)} />
+          <ClassRankList isMobile={isMobile} latestUpdatedAt={latestUpdatedAt} classroom={findClassroom(treeNodeId)} />
         ) : (
           <RankList isMobile={isMobile} assignment={findAssignment(treeNodeId)} />
         )}

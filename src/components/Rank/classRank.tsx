@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react'
-import { Table, Progress } from 'antd'
+import { Table, Progress, Modal } from 'antd'
+import dayjs from 'dayjs'
 import { orderBy, map, groupBy, keys, flatMap } from 'lodash'
 import Icon from '../../components/Icon'
 import type { ColumnsType } from 'antd/lib/table'
@@ -10,6 +11,7 @@ import AssignmentBar from './assignmentBar'
 interface IProps {
   classroom?: TClassroom
   isMobile?: boolean
+  latestUpdatedAt?: string
 }
 
 interface IDatasource {
@@ -207,14 +209,39 @@ const ClassRoomRank = (props: IProps) => {
       </ul>
     )
   }
+  const showUpdatetime = () => {
+    Modal.info({
+      className: 'update-time-dialog',
+      title: '最新数据更新时间',
+      centered: true,
+      width: '75%',
+      content: <div>{dayjs(props.latestUpdatedAt).format('YYYY-MM-DD HH:mm::ss')}</div>,
+      okText: '关闭',
+      okButtonProps: { style: { width: 120 } }
+    })
+  }
   return (
     <>
-      <Search
-        isMobile={props.isMobile}
-        defaultQuery={query}
-        onChange={(query) => setQuery(query)}
-        noLang
-      />
+      <div className="classrank-header">
+        <Search
+          isMobile={props.isMobile}
+          defaultQuery={query}
+          onChange={(query) => setQuery(query)}
+          noLang
+        />
+        {props.isMobile ? (
+          <Icon symbol="icon-autoupdate" onClick={showUpdatetime} />
+        ) : (
+          <span className="update-time">
+            最新数据更新时间:
+            {props.latestUpdatedAt && (
+              <span style={{ marginLeft: 10, fontWeight: 'bold' }}>
+                {dayjs(props.latestUpdatedAt).format('YYYY-MM-DD HH:mm::ss')}
+              </span>
+            )}
+          </span>
+        )}
+      </div>
       {props.isMobile ? (
         renderMobileRankList()
       ) : (

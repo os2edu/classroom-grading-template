@@ -35,15 +35,11 @@ const SearchList = (props: Partial<IProps>) => {
       prefix={<Icon symbol="icon-autosearch" />}
       // onSearch={(v) => onSearch('name', v)}
       style={{
-        width: '90%',
-        marginBottom: 12,
-        borderRadius: 20,
-        left: '50%',
-        transform: 'translateX(-50%)'
+        width: '84%',
       }}
     />
   ) : (
-    <Space size={60} style={{ marginBottom: 20, paddingLeft: 40 }}>
+    <Space size={60} style={{ paddingLeft: 40 }}>
       <Search
         value={query.name}
         placeholder="Name"

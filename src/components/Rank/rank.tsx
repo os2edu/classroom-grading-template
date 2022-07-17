@@ -383,7 +383,7 @@ const RankList = (props: IRankListProps) => {
   }
   return (
     <>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className='classrank-header'>
         <Search
           isMobile={props.isMobile}
           defaultQuery={query}

@@ -1,9 +1,9 @@
 {
-    "org": "learn-node",
+    "org": "LearningOS",
     "classrooms": [
         {
-            "name": "109397453-forth-grade",
-            "assignments": ["exercise-reading"],
+            "name": "2022 Training Comp on Open Source OS",
+            "assignments": ["lab0-1-run-os2", "lab1-os3", "lab2-os4"],
             "studentBlacklist": []
         }
     ],
@@ -11,5 +11,3 @@
         "title": "2022开源操作系统训练营排行榜"
     }
 }
-
-

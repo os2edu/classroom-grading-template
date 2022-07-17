@@ -5,7 +5,7 @@
   padding: 0;
 
   width: 100%;
-  margin: 24px 28px;
+  padding: 24px 28px;
 
   .classroom-tree-area {
     margin-right: @nav-gap;
@@ -85,8 +85,9 @@
 }
 
 .total-passed-info {
-  float: right;
   width: 180px;
+  position: absolute;
+  right: 0;
   .passed-count {
     display: flex;
     justify-content: space-between;
@@ -282,4 +283,12 @@
       }
     }
   }
+}
+
+.classrank-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  position: relative;
 }
