@@ -14,7 +14,8 @@ import './index.less'
 const { DirectoryTree } = Tree
 
 // @ts-ignore
-const classroomData = data as TClassroom[]
+const classroomData = data.classrooms as TClassroom[]
+const latest_updated_at = data.latest_updated_at
 
 const findClassroom = (key: string): TClassroom | undefined => {
   return classroomData.find(({ id }) => id === key)

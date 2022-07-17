@@ -42,10 +42,48 @@ class GitHubAPI {
       }
       return res.data
     } catch (err) {
-      console.log('fetch repo fail: ', err)
+      console.log('fetch repos fail: ', err)
       return []
     }
   }
+
+  async getRepo(repoName) {
+    try {
+      const res = await this.api.request('GET /repos/{owner}/{repo}', {
+        owner: this.org,
+        repo: repoName
+      })
+      return _.pick(res.data, [
+        'id',
+        'name',
+        'owner.login',
+        'owner.avatar_url',
+        'owner.html_url',
+        'private',
+        'html_url',
+        'pushed_at',
+        'created_at',
+        'updated_at'
+      ])
+    } catch (err) {
+      console.log('fetch repo fail: ', repoName, err)
+      return;
+    }
+  }
+
+  async getRepoContributors(repoName) {
+    try {
+      const res = await this.api.request('GET /repos/{owner}/{repo}/contributors', {
+        owner: this.org,
+        repo: repoName
+      })
+      return res.data
+    } catch (err) {
+      console.log(`getRepoContributors: ${err} in ${repoName}`)
+      return []
+    }
+  }
+
   async getRepoLanguages(repoName, assignmentName) {
     try {
       if (this.languagesCache[assignmentName]) {

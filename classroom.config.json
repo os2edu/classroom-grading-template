@@ -1,10 +1,10 @@
 {
-    "org": "LearningOS",
+    "org": "learn-node",
     "classrooms": [
         {
-            "name": "2022 Training Comp on Open Source OS",
-            "assignments": ["lab0-1-run-os2", "lab1-os3", "lab2-os4"],
-            "studentBlacklist": ["july-12"]
+            "name": "109397453-forth-grade",
+            "assignments": ["exercise-reading"],
+            "studentBlacklist": []
         }
     ],
     "website": {
