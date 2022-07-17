@@ -1,1 +1,74 @@
-## Github Classroom Assignment Rank Page
+### 介绍
+
+#### 该项目可用于快速部署一个 classroom 排行榜网站
+
+其是根据 [Github Classroom](https://classroom.github.com/) 里同学们的提交记录，结合 [github pages](https://pages.github.com/) 来生成一个排行网站，可以查看当前每一个作业的完成情况，搜索到自己和其他学生的排名，方便大家更快的了解到课堂的整体进度，提高同学们的参与度，督促自己的成长和进步。
+
+<div style="text-align: center"><img src="https://user-images.githubusercontent.com/108247373/179374302-0c54ef62-9338-4122-89f9-47d7f8dc2fab.png" alt="shortcut" width="200"/></div>
+
+### 如何快速部署
+
+#### 1. Fork 项目
+
+注意在 fork 时，需要将 **Owner** 设置为 classroom 所在的组织下。
+
+<img src="https://user-images.githubusercontent.com/108247373/179374180-2c4ae639-3295-409d-8fcc-610bd018bacb.png" alt="fork" width="400"/>
+
+#### 2. 添加 AUTH_TOKEN
+
+a. 首先获取组织中任意 **Owner** 成员的 **Personal access tokens** ([详细参考](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token))
+
+<img src="https://user-images.githubusercontent.com/920487/179375564-83b9360d-14be-470f-bae6-118098139fd6.png" alt="pat" width="400"/>
+
+b. 回到项目 setting 中， 把上一步获取的 **Personal access tokens** 配置给 action 的环境变量 **AUTH_TOKEN**
+
+<img src="https://user-images.githubusercontent.com/920487/179375600-8fc6102f-b7d0-40a2-a7d1-df026bbc290c.png" alt="pat" width="400"/>
+
+#### 3. 配置 gh-pages
+
+项目的 setting 中进行 pages 设置 
+
+<img src="https://user-images.githubusercontent.com/920487/179375401-0d57b303-36c9-4599-88fd-0f4d93a095cd.png" alt="fork" width="600"/>
+
+#### 4 打开 workflow 开关
+
+因为项目的 action 中有一个执行定时任务的 workflow， 需要手动开启。 该任务每小时会刷新一次排行榜数据。
+
+<img src="https://user-images.githubusercontent.com/920487/179376541-0a906707-1a43-4d37-ab50-d19c8812f87b.png" alt="fork" width="600"/>
+
+[为什么需要手动打开workflow](https://github.com/laravel/framework/issues/34356#issuecomment-718831832)
+
+#### 5. 修改配置
+
+将 fork 的项目 clone 到本地，修改 **classroom.config.json**
+
+注意配置字段中 **org** 和 **assignments** 是重要字段，决定数据采集的准确性, 必须与实际信息保证一致。 
+
+<img src="https://user-images.githubusercontent.com/108247373/179375014-8f81bc75-d49e-41fe-ae53-be5c8e483e84.png" alt="config" width="400"/>
+
+#### config 字段
+
+| 字段        | 描述           | 是否必填  |
+| ------------- |:-------------:| -----:|
+| org      | classroom所在组织| 是 |
+| classrooms      | 需要展示教室      |  否  |
+| website | 站点元信息      |  否   |
+
+#### classrooms 内部字段
+
+| 字段        | 描述           | 是否必填  |
+| ------------- |:-------------:| -----:|
+| name      | 教室名称，不要求与实际信息一致，仅起展示作用| 是 |
+| assignments      | 需要展示的作业排行榜, 必须实际信息一致      |  是  |
+| studentBlacklist | 黑明单，用于过滤不展示的学生作业      |  否   |
+
+
+#### website 内部字段
+
+| 字段        | 描述           | 是否必填  |
+| ------------- |:-------------:| -----:|
+| title      | 网站logo处名称 | 否 |
+| ...      | 根据需要可后期开放 | - |
+
+
+修改完成后 push 到 main 分支, 会自动触发执行 action，等待几分钟后，便可以访问自己的排行榜页面了
