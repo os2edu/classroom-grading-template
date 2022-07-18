@@ -14,7 +14,11 @@
 
 <img src="https://user-images.githubusercontent.com/108247373/179374180-2c4ae639-3295-409d-8fcc-610bd018bacb.png" alt="fork" width="400"/>
 
-#### 2. 添加 AUTH_TOKEN
+#### 2. 添加环境变量
+
+由于 action 在部署执行过程中会获取作业的最新数据，而更新的方式需要调用 [Github API](https://docs.github.com/cn/rest) 和 [classroom] (https://classroom.github.com/classrooms)的相关接口，因此需要配置以下两个变量获取访问接口的权限。
+
+##### AUTH_TOKEN
 
 a. 首先获取组织中任意 **Owner** 成员的 **Personal access tokens** ([详细参考](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token))
 
@@ -23,6 +27,12 @@ a. 首先获取组织中任意 **Owner** 成员的 **Personal access tokens** ([
 b. 回到项目 setting 中， 把上一步获取的 **Personal access tokens** 配置给 action 的环境变量 **AUTH_TOKEN**
 
 <img src="https://user-images.githubusercontent.com/920487/179375600-8fc6102f-b7d0-40a2-a7d1-df026bbc290c.png" alt="pat" width="400"/>
+
+##### SESSION_TOKEN
+
+该变量的值是取登录到 classroom.github.com 网站中的 cookie.\_github_classroom_session字段
+
+<img src="https://user-images.githubusercontent.com/920487/179450068-c620e185-583f-4f83-a372-ee2c2825b805.png" alt="pat" width="400"/>
 
 #### 3 打开 workflow 开关
 
@@ -42,9 +52,9 @@ b. 回到项目 setting 中， 把上一步获取的 **Personal access tokens** 
 
 将 fork 的项目 clone 到本地，修改 **classroom.config.json**
 
-注意配置字段中 **org** 和 **assignments** 是重要字段，决定数据采集的准确性, 必须与实际信息保证一致。
+注意配置字段中 **org** 和 **classrooms** 是重要字段，决定数据采集的准确性, 必须与实际信息保证一致。
 
-<img src="https://user-images.githubusercontent.com/108247373/179375014-8f81bc75-d49e-41fe-ae53-be5c8e483e84.png" alt="config" width="400"/>
+<img src="https://user-images.githubusercontent.com/920487/179450921-b7a53c40-cccb-4648-8ea8-8000f8f02432.png" alt="config" width="400"/>
 
 #### 字段
 
