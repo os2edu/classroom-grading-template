@@ -12,11 +12,11 @@
 
 注意在 fork 时，需要将 **Owner** 设置为 classroom 所在的组织下。
 
-<img src="https://user-images.githubusercontent.com/108247373/179374180-2c4ae639-3295-409d-8fcc-610bd018bacb.png" alt="fork" width="400"/>
+<img src="https://user-images.githubusercontent.com/920487/179538395-b8df34ad-5bb5-4ffb-88e5-394f39121068.png" alt="fork" width="400"/>
 
 #### 2. 添加环境变量
 
-由于 action 在部署执行过程中会获取作业的最新数据，而更新的方式需要调用 [Github API](https://docs.github.com/cn/rest) 和 [classroom] (https://classroom.github.com/classrooms)的相关接口，因此需要配置以下两个变量获取访问接口的权限。
+由于 action 在部署执行过程中会获取作业的最新数据，而更新的方式需要调用 [Github API](https://docs.github.com/cn/rest) 和 [classroom](https://classroom.github.com/classrooms)的相关接口，因此需要配置以下两个变量获取访问接口的权限。
 
 ##### AUTH_TOKEN
 
