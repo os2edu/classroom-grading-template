@@ -27,7 +27,7 @@ function streamToString(stream) {
   })
 }
 
-async function fetchAssignments(classroom, assigment) {
+async function fetchAssignments(classroom, assigment, sessionToken) {
 
   return new Promise(async (resolve, reject) => {
 
@@ -47,7 +47,7 @@ async function fetchAssignments(classroom, assigment) {
         'sec-fetch-user': '?1',
         'upgrade-insecure-requests': '1',
         cookie:
-            '_octo=GH1.1.980811440.1655977492; logged_in=yes; dotcom_user=july-12; color_mode=%7B%22color_mode%22%3A%22auto%22%2C%22light_theme%22%3A%7B%22name%22%3A%22light%22%2C%22color_mode%22%3A%22light%22%7D%2C%22dark_theme%22%3A%7B%22name%22%3A%22dark_dimmed%22%2C%22color_mode%22%3A%22dark%22%7D%7D; tz=Asia%2FShanghai; preferred_color_mode=light; _github_classroom_session=exejpR%2BWDTupP8l3%2BCUr1XwrdBUtM7NTGI8UhGQUBxNsin2Tu8tTjt2mfyPH302l80%2F7%2BfBY0KKWvIDA5s03BGtb%2F0OXXgZL2u7aUxDp19slpfPXYPiP%2FZWIoVwbAQwGbzhMsx0xk3mgyW%2BfbwuuPskydJW0UVBTrG3XV%2BE8Ou1hFNPC0IIxNyQNRUOSHi74lDTHR6w27r7MxfX70HzaeyhfhfDJxt76wm4AcOuzNycXN6U1KzM%2BOcca9m7n8IOWCxLFcP5gEaLreMfnK44OmRu9vsFYk%2BylbzmwW8ukQfUe9MVfFsjIWQ8numYkwvOU0Ksv6qupSg9VcI9Obyj48QHI8Ezu7mUu05%2B%2BmRpxhCngF9EwS57%2BECdpSbld3m29lJe%2BAqeT2hnsfTJDSariWWRzM409nMXt%2FlUHRCoRSD98jpK381mKm1z13TqCz31hDnwJp3PHUGGC%2BSpFSGzn3zW1JWO42EUaTozD8hWJSnW7--70oVkSTvM5NGI5Py--J%2Bg2Fv8Gk0NQusz5n3GcZA%3D%3D'
+            `_github_classroom_session=${sessionToken}`
         },
         referrerPolicy: 'strict-origin-when-cross-origin',
         body: null,

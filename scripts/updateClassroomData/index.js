@@ -3,11 +3,14 @@ const dayjs = require('dayjs')
 const _ = require('lodash')
 require('dotenv').config()
 
-const userCache = require('../cache/user.json')
-const workflowCache = require('../cache/workflow.json')
+// const userCache = require('../cache/user.json')
+// const workflowCache = require('../cache/workflow.json')
 const { fetchAssignments } = require('./assignments')
 const { GitHubAPI } = require('./githubAPI')
 const config = require('../../classroom.config.json')
+
+const userCache = {}
+const workflowCache = {}
 
 async function run() {
   const parseClassrooms = config.classrooms
@@ -42,7 +45,7 @@ async function run() {
     return Promise.all(
       _.map(assignments, async (assignment) => {
         // const currentAssignmentRepos = _.filter(repos, (repo) => repoName.includes(assignment))
-        const repos = await fetchAssignments(classroom, assignment)
+        const repos = await fetchAssignments(classroom, assignment, process.env.SESSION_TOKEN)
         const student_repositories = await Promise.all(
           _.map(repos, async (repo) => {
             // const [_assignmentName, author] = repoName.split(assignment)
@@ -110,7 +113,7 @@ async function run() {
           })
         )
         return {
-          id: assignment,
+          id: classroom + assignment,
           title: assignment,
           student_repositories: student_repositories.filter(item => !!item)
         }
@@ -137,8 +140,8 @@ async function run() {
     })
   )
 
-  fs.writeFileSync('./scripts/cache/user.json', JSON.stringify(userCache))
-  fs.writeFileSync('./scripts/cache/workflow.json', JSON.stringify(workflowCache))
+  // fs.writeFileSync('./scripts/cache/user.json', JSON.stringify(userCache))
+  // fs.writeFileSync('./scripts/cache/workflow.json', JSON.stringify(workflowCache))
   fs.writeFileSync('./src/data.json', JSON.stringify({ classrooms, latest_updated_at: new Date() }))
 }
 

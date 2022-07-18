@@ -26,6 +26,7 @@ jobs:
       - name: create env file
         run: |
           echo AUTH_TOKEN=${{ secrets.AUTH_TOKEN }} >> .env
+          echo SESSION_TOKEN=${{ secrets.SESSION_TOKEN }} >> .env
       - name: update classroom data
         run: yarn setup
       - name: build pages
