@@ -65,7 +65,8 @@ async function run() {
               return; 
             }
 
-            const commits = await api.getRepoCommits(repoName, repoDetail.created_at)
+            let commits = await api.getRepoCommits(repoName, repoDetail.created_at)
+            commits = _.filter(commits, item => item.author && item.author.login === studentName)
             const hasSubmitAssignment = !_.isEmpty(commits)
 
             let runs = [] // 执行CI的任务

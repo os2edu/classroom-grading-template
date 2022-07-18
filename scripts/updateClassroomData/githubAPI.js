@@ -110,8 +110,11 @@ class GitHubAPI {
         since,
         per_page: MAX_PER_PAGE
       })
-      return _.filter(res.data, (item) => !item.author).map((item) =>
-        _.pick(item, ['html_url', 'sha', 'commit.author', 'commit.message'])
+      // return _.filter(res.data, (item) => !item.author).map((item) =>
+      //   _.pick(item, ['html_url', 'sha', 'commit.author', 'commit.message'])
+      // )
+      return _.map(res.data, (item) =>
+        _.pick(item, ['html_url', 'sha', 'author.login', 'author.type', 'author.avatar_url', 'commit.author', 'commit.message'])
       )
     } catch (err) {
       console.log(`getRepoCommits: ${err}  in ${repo}, ${author}`)
