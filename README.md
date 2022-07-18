@@ -16,9 +16,9 @@
 
 #### 2. 添加环境变量
 
-由于 action 在部署执行过程中会获取作业的最新数据，而更新的方式需要调用 [Github API](https://docs.github.com/cn/rest) 和 [classroom](https://classroom.github.com/classrooms)的相关接口，因此需要配置以下两个变量获取访问接口的权限。
+由于 action 在部署执行过程中会获取作业的最新数据，而更新的方式需要调用 [Github API](https://docs.github.com/cn/rest) 和 [classroom](https://classroom.github.com/classrooms) 的相关接口，因此需要配置以下两个变量获取访问接口的权限。
 
-##### AUTH_TOKEN
+##### 设置 AUTH_TOKEN
 
 a. 首先获取组织中任意 **Owner** 成员的 **Personal access tokens** ([详细参考](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token))
 
@@ -28,7 +28,7 @@ b. 回到项目 setting 中， 把上一步获取的 **Personal access tokens** 
 
 <img src="https://user-images.githubusercontent.com/920487/179375600-8fc6102f-b7d0-40a2-a7d1-df026bbc290c.png" alt="pat" width="400"/>
 
-##### SESSION_TOKEN
+##### 设置 SESSION_TOKEN
 
 该变量的值是取登录到 classroom.github.com 网站中的 cookie.\_github_classroom_session字段
 
@@ -56,7 +56,11 @@ b. 回到项目 setting 中， 把上一步获取的 **Personal access tokens** 
 
 <img src="https://user-images.githubusercontent.com/920487/179450921-b7a53c40-cccb-4648-8ea8-8000f8f02432.png" alt="config" width="400"/>
 
-#### 字段
+完整的 classroom 名称:
+
+<img src="https://user-images.githubusercontent.com/108247373/179397657-f8bbc0cf-958a-4edb-bf98-477591de013f.png" alt="config" width="200"/>
+
+#### 配置字段说明
 
 | 字段       |        描述        | 是否必填 |
 | ---------- | :----------------: | -------: |
@@ -71,10 +75,6 @@ b. 回到项目 setting 中， 把上一步获取的 **Personal access tokens** 
 | name             | 必须与实际信息一致, 注意要求完整名称，包括 id，看下图说明 |       是 |
 | assignments      |         需要展示的作业排行榜, 必须与实际信息一致          |       是 |
 | studentBlacklist |            黑明单，用于过滤不参加排名的的学生             |       否 |
-
-完整的 classroom 名称:
-
-<img src="https://user-images.githubusercontent.com/108247373/179397657-f8bbc0cf-958a-4edb-bf98-477591de013f.png" alt="config" width="200"/>
 
 #### website 内部字段
 
