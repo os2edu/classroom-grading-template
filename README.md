@@ -30,7 +30,7 @@ b. 回到项目 setting 中， 把上一步获取的 **Personal access tokens** 
 
 ##### 设置 SESSION_TOKEN
 
-该变量的值是取登录到 classroom.github.com 网站中的 cookie.\_github_classroom_session字段
+该变量的值是取登录到 classroom.github.com 网站中的 cookie.\_github_classroom_session 字段
 
 <img src="https://user-images.githubusercontent.com/920487/179450068-c620e185-583f-4f83-a372-ee2c2825b805.png" alt="pat" width="400"/>
 
@@ -52,9 +52,9 @@ b. 回到项目 setting 中， 把上一步获取的 **Personal access tokens** 
 
 将 fork 的项目 clone 到本地，修改 **classroom.config.json**
 
-注意配置字段中 **org** 和 **classrooms** 是重要字段，决定数据采集的准确性, 必须与实际信息保证一致。
+注意配置字段中 **org** 和 **classrooms** 是重要字段，决定数据采集的准确性，必须与实际信息保证一致。
 
-<img src="https://user-images.githubusercontent.com/920487/179450921-b7a53c40-cccb-4648-8ea8-8000f8f02432.png" alt="config" width="400"/>
+<img src="https://user-images.githubusercontent.com/108247373/179552983-c3807fbf-bcbf-4a24-9bf6-9116d6ca8137.png" alt="config" width="400"/>
 
 完整的 classroom 名称:
 
@@ -65,22 +65,22 @@ b. 回到项目 setting 中， 把上一步获取的 **Personal access tokens** 
 | 字段       |        描述        | 是否必填 |
 | ---------- | :----------------: | -------: |
 | org        | classroom 所在组织 |       是 |
-| classrooms |        教室        |       否 |
+| classrooms |        教室        |       是 |
 | website    |     站点元信息     |       否 |
 
 #### classrooms 内部字段
 
 | 字段             |                           描述                            | 是否必填 |
 | ---------------- | :-------------------------------------------------------: | -------: |
-| name             | 必须与实际信息一致, 注意要求完整名称，包括 id，看下图说明 |       是 |
-| assignments      |         需要展示的作业排行榜, 必须与实际信息一致          |       是 |
-| studentBlacklist |            黑明单，用于过滤不参加排名的的学生             |       否 |
+| name             | 必须与实际信息一致，注意要求完整名称，包括 id，看下图说明 |       是 |
+| assignments      |         需要展示的作业排行榜，必须与实际信息一致          |       是 |
+| studentBlacklist |            黑名单，用于过滤不参加排名的的学生             |       否 |
 
 #### website 内部字段
 
 | 字段  |        描述        | 是否必填 |
 | ----- | :----------------: | -------: |
 | title |  网站 logo 处名称  |       否 |
-| ...   | 根据需要可后期开放 |        - |
+| ...   | 根据需要可后期开放其他字段 |        - |
 
-修改完成后 push 到 main 分支, 会自动触发执行 action，等待几分钟后，便可以访问自己的排行榜页面了
+修改完成后 push 到 main 分支，会自动触发执行 action，等待几分钟后，便可以访问自己的排行榜页面了。
