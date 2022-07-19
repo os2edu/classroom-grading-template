@@ -117,7 +117,7 @@ class GitHubAPI {
         _.pick(item, ['html_url', 'sha', 'author.login', 'author.type', 'author.avatar_url', 'commit.author', 'commit.message'])
       )
     } catch (err) {
-      console.log(`getRepoCommits: ${err}  in ${repo}, ${author}`)
+      console.log(`getRepoCommits: ${err}  in ${repo}`)
       return []
     }
   }
