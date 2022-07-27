@@ -115,6 +115,7 @@ async function run() {
               )
             }
 
+            branches = branches.filter(br => !_.isEmpty(br))
             const defaultBranchIndex = (branches).findIndex(
               (branch) => branch.branchName === repoDetail.default_branch
             ) || 0
