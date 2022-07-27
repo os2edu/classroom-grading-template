@@ -1,13 +1,13 @@
 {
-    "org": "LearningOS",
-    "classrooms": [
-        {
-            "name": "19380377-2022-training-comp-on-open-source-os",
-            "assignments": ["lab0-1-run-os2", "lab1-os3", "lab2-os4"],
-            "studentBlacklist": []
-        }
-    ],
-    "website": {
-        "title": "2022开源操作系统训练营排行榜"
+  "org": "learn-node",
+  "classrooms": [
+    {
+      "name": "109397453-learn-node-classroom-32d9a5",
+      "assignments": [["exercise-reading", { "branches": [ "lab0", "lab1" ] }], "c-language"],
+      "studentBlacklist": []
     }
+  ],
+  "website": {
+    "title": "2022开源操作系统训练营排行榜"
+  }
 }

@@ -2,12 +2,16 @@
 @header-height: 60px;
 
 .container {
+  height: 100%;
   & > header {
     height: @header-height;
     border-bottom: 1px solid #f0f0f0;
   }
   .main-menu {
     padding-left: @nav-width;
+  }
+  .rank-container {
+    height: calc(100% - @header-height);
   }
 }
 

@@ -5,6 +5,7 @@ const MAX_PER_PAGE = 100 // 每页最大饭回数据
 class GitHubAPI {
   userCache = {}
   languagesCache = {}
+  count = 0
   constructor({ auth, org }) {
     this.auth = auth
     this.org = org
@@ -12,13 +13,14 @@ class GitHubAPI {
   }
 
   get api() {
+    this.count += 1
     return this._octokit
   }
 
   async init() {
     try {
       this._octokit = new Octokit({ auth: this.auth })
-      // this.getAuthenticated()
+      this.getAuthenticated()
     } catch (err) {
       throw new Error('initialize Octokit fails: ', err)
     }
@@ -56,6 +58,7 @@ class GitHubAPI {
       return _.pick(res.data, [
         'id',
         'name',
+        'default_branch',
         'owner.login',
         'owner.avatar_url',
         'owner.html_url',
@@ -67,7 +70,20 @@ class GitHubAPI {
       ])
     } catch (err) {
       console.log('fetch repo fail: ', repoName, err)
-      return;
+      return
+    }
+  }
+
+  async getBranches(repoName) {
+    try {
+      const res = await this.api.request('GET /repos/{owner}/{repo}/branches', {
+        owner: this.org,
+        repo: repoName
+      })
+      return res.data
+    } catch (err) {
+      console.log(`getBranches: ${err} in ${repoName}`)
+      return []
     }
   }
 
@@ -114,7 +130,15 @@ class GitHubAPI {
       //   _.pick(item, ['html_url', 'sha', 'commit.author', 'commit.message'])
       // )
       return _.map(res.data, (item) =>
-        _.pick(item, ['html_url', 'sha', 'author.login', 'author.type', 'author.avatar_url', 'commit.author', 'commit.message'])
+        _.pick(item, [
+          'html_url',
+          'sha',
+          'author.login',
+          'author.type',
+          'author.avatar_url',
+          'commit.author',
+          'commit.message'
+        ])
       )
     } catch (err) {
       console.log(`getRepoCommits: ${err}  in ${repo}`)
@@ -139,19 +163,33 @@ class GitHubAPI {
       return 'NotFound'
     }
   }
-  async get_workflow_runs(repoName, workflowId) {
+  async getWorkflowRuns(repoName, workflowId) {
     try {
       const res = await this.api.request(
         'GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}/runs',
         {
           owner: this.org,
           repo: repoName,
-          workflow_id: workflowId,
-          per_page: 3 // 仅取最新的三条run
+          workflow_id: workflowId
         }
       )
-      // 最多取3条runs
-      return res.data.workflow_runs
+      return _.map(res.data.workflow_runs, (run) =>
+        _.pick(run, [
+          'id',
+          'name',
+          'path',
+          'event',
+          'head_branch',
+          'conclusion',
+          'status',
+          'check_suite_id',
+          'html_url',
+          'run_started_at',
+          'updated_at',
+          'created_at',
+          'triggering_actor.login'
+        ])
+      )
     } catch (err) {
       console.log(`get_workflow_runs: ${err} in ${repoName} ${workflowId}`)
       return []
@@ -203,7 +241,7 @@ class GitHubAPI {
     try {
       const classroomWorkflowId = workflow_id || (await this.getClassroomWorkflowId(repoName))
       if (classroomWorkflowId) {
-        const resRuns = await this.get_workflow_runs(repoName, classroomWorkflowId)
+        const resRuns = await this.getWorkflowRuns(repoName, classroomWorkflowId)
         const runs = await Promise.all(
           resRuns.map(async (item) =>
             _.pick(item, [

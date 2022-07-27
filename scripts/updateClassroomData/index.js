@@ -10,7 +10,7 @@ const { GitHubAPI } = require('./githubAPI')
 const config = require('../../classroom.config.json')
 
 const userCache = {}
-const workflowCache = {}
+// const workflowCache = {}
 
 async function run() {
   const parseClassrooms = config.classrooms
@@ -25,98 +25,115 @@ async function run() {
     org: config.org
   })
 
-  // console.log(s)
-  // console.log('assigments')
-  // return;
-  // const reposResult = await api.getRepos()
-  // const repos = _.map(reposResult, (item) =>
-  //   _.pick(item, [
-  //     'name',
-  //     'html_url',
-  //     'language',
-  //     'private',
-  //     'created_at',
-  //     'pushed_at',
-  //     'updated_at'
-  //   ])
-  // )
-
   const parseAssignments = async (classroom, assignments) => {
     return Promise.all(
-      _.map(assignments, async (assignment) => {
-        // const currentAssignmentRepos = _.filter(repos, (repo) => repoName.includes(assignment))
+      _.map(assignments, async (assignmentItem) => {
+        assignmentItem =[].concat(assignmentItem)
+        const assignment = _.first(assignmentItem)
+        const options = assignmentItem[1] || {}
+        if(!assignment) {
+          throw new Error('assignment config wrong!')
+        }
         const repos = await fetchAssignments(classroom, assignment, process.env.SESSION_TOKEN)
         const student_repositories = await Promise.all(
           _.map(repos, async (repo) => {
-            // const [_assignmentName, author] = repoName.split(assignment)
-            // const studentName = author.slice(1)
             const studentName = repo.github_username
             const repoName = repo.student_repository_name
 
-            const studentInfo = userCache[studentName] || (await api.getUserInfo(studentName))
+            let studentInfo = userCache[studentName] || (await api.getUserInfo(studentName))
             if (studentInfo === 'NotFound') {
-              return null
+              studentInfo = {}
+            } else {
+              userCache[studentName] = studentInfo
             }
-            userCache[studentName] = studentInfo
 
             const repoDetail = await api.getRepo(repoName)
-            if (!repoDetail) { 
+            if (!repoDetail) {
               console.log(`this repo: ${repoName} parse wrong, in classroom: ${classroom}`)
-              return; 
+              return
             }
 
-            let commits = await api.getRepoCommits(repoName, repoDetail.created_at)
-            commits = _.filter(commits, item => item.author && item.author.login === studentName)
-            const hasSubmitAssignment = !_.isEmpty(commits)
+            const branchesOfRepo = await api.getBranches(repoName)
 
-            let runs = [] // 执行CI的任务
-            let latestRun = null // 最新执行的一次任务
-            let latestRunJobs = [] // 最新CI任务的执行jobs
-            let autoGradingJob = null // 执行排名的job
-
-            if (hasSubmitAssignment) {
-              const [GitHubClassroomWorkflowId, CIRuns] = await api.getCIInfo(
-                repoName,
-                workflowCache[repoName]
+            let branches = []
+            const classroomWorkflowId = await api.getClassroomWorkflowId(repoName)
+            if (classroomWorkflowId) {
+              const runs = await api.getWorkflowRuns(repoName, classroomWorkflowId)
+              const runGroup = _.groupBy(runs, 'head_branch')
+              branches = await Promise.all(
+                _.filter(branchesOfRepo, br => br.name === repoDetail.default_branch || _.includes(options.branches, br.name)).map(async (branch) => {
+                  let runs = runGroup[branch.name]
+                  const submitCommitCount = _.filter(runs, (run) => {
+                    if (run.triggering_actor) {
+                      return !run.triggering_actor.login.includes('github-classroom[bot]')
+                    }
+                    return true
+                  }).length
+                  if (_.isEmpty(runs)) {
+                    console.log('runs data is empty', branch.name)
+                    return
+                  }
+                  let jobs = []
+                  let autoGradingJob = undefined
+                  if (submitCommitCount) {
+                    jobs = await api.getJobs(repoName, runs[0].id)
+                    if (_.isEmpty(jobs)) {
+                      console.log('jobs data is empty', branch.name)
+                      return
+                    }
+                    autoGradingJob = _.find(jobs, (job) => job.name === 'Autograding')
+                    if (!autoGradingJob) {
+                      console.log('autoGradingJob data is undefined', branch.name)
+                      return
+                    }
+                  }
+                  const isSuccess = submitCommitCount && autoGradingJob ? autoGradingJob.conclusion === 'success' : false
+                  const firstRun = _.last(runs)
+                  return {
+                    branchName: branch.name,
+                    commitCount: submitCommitCount,
+                    hasSubmited: submitCommitCount > 0,
+                    runs,
+                    autoGradingJob,
+                    isSuccess,
+                    executeTime: autoGradingJob
+                      ? dayjs(autoGradingJob.completed_at).diff(
+                          autoGradingJob.started_at,
+                          'second',
+                          true
+                        )
+                      : null,
+                    submission_timestamp: submitCommitCount && firstRun ? firstRun.created_at : '',
+                    points_awarded: isSuccess ? '100' : '0',
+                    points_available: submitCommitCount && firstRun ? '100' : '0'
+                  }
+                })
               )
-              workflowCache[repoName] = GitHubClassroomWorkflowId
-              runs = CIRuns
-              latestRun = _.first(runs)
-
-              if (latestRun) {
-                latestRunJobs = await api.getJobs(repoName, latestRun.id)
-                autoGradingJob = _.find(latestRunJobs, (job) => job.name === 'Autograding')
-              }
             }
 
-            const isSuccess = autoGradingJob ? autoGradingJob.conclusion === 'success' : false
+            const defaultBranchIndex = (branches).findIndex(
+              (branch) => branch.branchName === repoDetail.default_branch
+            ) || 0
+
+            const defaultBranch = branches.splice(defaultBranchIndex, 1)[0] || {}
+
             return {
               name: studentName,
               avatar: studentInfo.avatar_url,
               studentInfo: studentInfo,
               repo: repoDetail,
               repoURL: repoDetail.html_url,
-              commits,
-              runs,
-              latestRunJobs,
-              // latestRun,
-              // latestRunJobs,
-              // autoGradingJob,
-              isSuccess,
               languages: [].concat(repo.language || []),
-              executeTime: autoGradingJob
-                ? dayjs(autoGradingJob.completed_at).diff(autoGradingJob.started_at, 'second', true)
-                : null,
-              submission_timestamp: hasSubmitAssignment ? commits[0].commit.author.date : '',
-              points_awarded: isSuccess ? '100' : '0',
-              points_available: hasSubmitAssignment ? '100' : '0'
+              ...defaultBranch,
+              branches,
             }
           })
         )
         return {
-          id: classroom + assignment,
+          id: classroom + '-' + assignment,
           title: assignment,
-          student_repositories: student_repositories.filter(item => !!item)
+          branches: options.branches,
+          student_repositories: student_repositories.filter((item) => !!item)
         }
       })
     )
@@ -131,7 +148,8 @@ async function run() {
         return
       }
 
-      const title = classroomStr.slice(id.length + 1)
+      const classroomName = classroomStr.slice(id.length + 1)
+      const title = classroomName.split('-classroom')[0]
       return {
         title,
         id: classroomStr,
@@ -143,7 +161,8 @@ async function run() {
 
   // fs.writeFileSync('./scripts/cache/user.json', JSON.stringify(userCache))
   // fs.writeFileSync('./scripts/cache/workflow.json', JSON.stringify(workflowCache))
-  fs.writeFileSync('./src/data.json', JSON.stringify({ classrooms, latest_updated_at: new Date() }))
+  console.log('api use count: ', api.count)
+  fs.writeFileSync('./src/data.json', JSON.stringify({ classrooms, latest_updated_at: new Date(), apiUseCount: api.count }))
 }
 
 run()

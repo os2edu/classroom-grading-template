@@ -53,23 +53,29 @@ type TRun = {
   // jobs: IJob[]
 }
 
-export type TStudentHomework = {
+export interface IWorkflowInfo {
+  branchName?: string
+  commitCount: number
+  hasSubmited?: boolean
+  runs: TRun[]
+  // latestRun?: TRun
+  // latestRunJobs?: TJob[]
+  autoGradingJob?: TJob
+  executeTime?: string
+  isSuccess: boolean
+  submission_timestamp: string
+  points_awarded: string
+  points_available: string
+}
+export interface TStudentHomework extends Partial<IWorkflowInfo> {
   name: string
   avatar?: string
   studentInfo: TStudentInfo
   repoURL: string
-  isSuccess: boolean
-  commits: TCommit[]
+  // commits?: TCommit[]
   languages: string[]
-  runs: TRun[]
-  // latestRun?: TRun
-  latestRunJobs?: TJob[]
-  // autoGradingJob?: TJob
-  executeTime?: string
-  submission_timestamp: string
-  points_awarded: string
-  points_available: string
   rank?: number
+  branches?: IWorkflowInfo[]
 }
 
 export type TAssignment = {
@@ -78,6 +84,7 @@ export type TAssignment = {
   url?: string
   starter_code_url?: string
   student_repositories: TStudentHomework[]
+  branches: string[]
 }
 
 export type TClassroom = {

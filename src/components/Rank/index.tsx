@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { Tree } from 'antd'
+import { isEmpty, map, pick, find } from 'lodash'
 import type { DataNode, DirectoryTreeProps } from 'antd/lib/tree'
 import RankList from './rank'
 import ClassRankList from './classRank'
-import { TAssignment, TClassroom } from './types'
+import { TAssignment, TClassroom, IWorkflowInfo, TStudentHomework } from './types'
 import data from '../../data.json'
 import MobileNav from './mobileNav'
 import Icon from '../Icon'
@@ -12,6 +13,7 @@ import Icon from '../Icon'
 import './index.less'
 
 const { DirectoryTree } = Tree
+export const connector = '~@~'
 
 // @ts-ignore
 const classroomData = data.classrooms as TClassroom[]
@@ -22,11 +24,27 @@ const findClassroom = (key: string): TClassroom | undefined => {
 }
 
 const findAssignment = (key: string): TAssignment | undefined => {
-  const idx = classroomData.findIndex((item) =>
-    item.assignments.some((assignment) => assignment.id === key)
-  )
-  if (idx > -1) {
-    return classroomData[idx].assignments.find((assignment) => assignment.id === key)
+  const [assigmentId, branch] = key.split(connector)
+  let asssignmentIdx: number = -1;
+  const classroomIdx = classroomData.findIndex((item) =>{
+    const idx = item.assignments.findIndex((assignment) => assignment.id === assigmentId)
+    const findIdx = idx > -1
+    if(findIdx) {
+      asssignmentIdx = idx
+    }
+    return findIdx
+  })
+  if(classroomIdx > -1 && asssignmentIdx > -1) {
+    const assigment =  classroomData[classroomIdx].assignments[asssignmentIdx]
+    if(branch) {
+      const { student_repositories } = assigment
+      const student_branch_repositories: TStudentHomework[] = map(student_repositories, repository => {
+        const currentBranchInfo: Partial<IWorkflowInfo> = find(repository.branches, br => br.branchName === branch) || {}
+        return { ...pick(repository, ['name', 'avatar', 'studentInfo', 'repoURL', 'languages']), ...currentBranchInfo }
+      })
+      return { ...assigment, student_repositories: student_branch_repositories }
+    }
+    return assigment
   }
 }
 
@@ -40,11 +58,21 @@ const Rank = ({ isMobile }: { isMobile?: boolean }) => {
       title: item.title,
       key: item.id,
       isClass: true,
+      icon: <Icon symbol='icon-autozuoye1' />,
       children: item.assignments.map((assignment) => {
         return {
           title: assignment.title,
           key: assignment.id,
-          isLeaf: true
+          icon: <Icon symbol='icon-autowj-rz' />,
+          isLeaf: isEmpty(assignment.branches),
+          children: map(assignment.branches, br => {
+            return {
+              title: br,
+              key: `${assignment.id}${connector}${br}`,
+              icon: <Icon symbol='icon-autozuoye' />,
+              isLeaf: true
+            }
+          })
         }
       })
     }
@@ -96,7 +124,7 @@ const Rank = ({ isMobile }: { isMobile?: boolean }) => {
         {isClassNode ? (
           <ClassRankList isMobile={isMobile} latestUpdatedAt={latestUpdatedAt} classroom={findClassroom(treeNodeId)} />
         ) : (
-          <RankList isMobile={isMobile} assignment={findAssignment(treeNodeId)} />
+          <RankList isMobile={isMobile} assignment={findAssignment(treeNodeId)} treeNodeId={treeNodeId} />
         )}
       </main>
     </div>

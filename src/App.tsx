@@ -29,7 +29,6 @@ function App() {
           </div>
         </div>
         <Contact isMobile={mobile} />
-        {mobile ? <div style={{ marginTop: 10 }} /> : <></>}
       </header>
       <Rank isMobile={mobile} />
     </div>

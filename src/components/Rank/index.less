@@ -1,5 +1,7 @@
 @nav-width: 240px;
 @nav-gap: 30px;
+@tree-node-height: 44px;
+
 .rank-container {
   display: flex;
   padding: 0;
@@ -47,6 +49,13 @@
     height: 100%;
     background-color: rgba(#ddd, 0.3);
     transition: width 0.2s;
+    .ant-tree-treenode {
+      height: @tree-node-height;
+      align-items: center;
+      .ant-tree-switcher {
+        display: none;
+      }
+    }
   }
   .rank-list {
     // flex: 1;
