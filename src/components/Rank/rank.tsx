@@ -175,11 +175,11 @@ const RankList = (props: IRankListProps) => {
         }
       },
       {
-        title: '第一次提交时间',
+        title: '第一次成功时间',
         align: 'center',
         width: 150,
-        dataIndex: 'firstSubmitedAt',
-        key: 'firstSubmitedAt',
+        dataIndex: 'firstSuccessAt',
+        key: 'firstSuccessAt',
         render(text, record) {
           if (!record.hasSubmited) {
             return '-'
@@ -244,7 +244,7 @@ const RankList = (props: IRankListProps) => {
       let currentRank = 1
       return orderBy(
         props.assignment?.student_repositories,
-        [sortBoolean('hasSubmited'), sortBoolean('isSuccess'), 'firstSubmitedAt'],
+        [sortBoolean('hasSubmited'), sortBoolean('isSuccess'), 'firstSuccessAt'],
         ['asc', 'asc', 'asc']
       ).map((item) => {
         let rank

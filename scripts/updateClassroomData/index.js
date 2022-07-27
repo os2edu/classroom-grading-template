@@ -90,6 +90,7 @@ async function run() {
                   }
                   const isSuccess = autoGradingJob && autoGradingJob ? autoGradingJob.conclusion === 'success' : false
                   const latestRun = _.first(runs)
+                  const firstSuccessRun = _.find(runs, run => run.conclusion === 'success')
                   const firstRun = _.last(runs)
                   return {
                     branchName: branch.name,
@@ -99,6 +100,7 @@ async function run() {
                     hasSubmited,
                     isSuccess,
                     firstSubmitedAt: hasSubmited && firstRun ? firstRun.run_started_at : '',
+                    firstSuccessAt: hasSubmited && firstSuccessRun ? firstRun.run_started_at : '',
                     latestUpdatedAt: hasSubmited && latestRun ? latestRun.run_started_at : '',
                     executeTime: autoGradingJob
                       ? dayjs(autoGradingJob.completed_at).diff(
