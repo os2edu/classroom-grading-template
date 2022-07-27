@@ -6,19 +6,19 @@
 
 <div style="text-align: center"><img src="https://user-images.githubusercontent.com/108247373/179374302-0c54ef62-9338-4122-89f9-47d7f8dc2fab.png" alt="shortcut" width="200"/></div>
 
-### 如何快速部署
+## 如何快速部署
 
-#### 1. Fork 项目
+### 1. Fork 项目
 
-注意在 fork 时，需要将 **Owner** 设置为 classroom 所在的组织下。
+注意在 fork 时，需要将下面的 **Owner** 设置为 classroom 所在的组织下。
 
 <img src="https://user-images.githubusercontent.com/920487/179538395-b8df34ad-5bb5-4ffb-88e5-394f39121068.png" alt="fork" width="400"/>
 
-#### 2. 添加环境变量
+### 2. 添加环境变量
 
 由于 action 在部署执行过程中会获取作业的最新数据，而更新的方式需要调用 [Github API](https://docs.github.com/cn/rest) 和 [classroom](https://classroom.github.com/classrooms) 的相关接口，因此需要配置以下两个变量获取访问接口的权限。
 
-##### 设置 AUTH_TOKEN
+##### 2.1 设置 AUTH_TOKEN
 
 a. 首先获取组织中任意 **Owner** 成员的 **Personal access tokens** ([详细参考](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token))
 
@@ -28,13 +28,13 @@ b. 回到项目 setting 中， 把上一步获取的 **Personal access tokens** 
 
 <img src="https://user-images.githubusercontent.com/920487/179375600-8fc6102f-b7d0-40a2-a7d1-df026bbc290c.png" alt="pat" width="400"/>
 
-##### 设置 SESSION_TOKEN
+##### 2.2 设置 SESSION_TOKEN
 
 该变量的值是取登录到 classroom.github.com 网站中的 cookie.\_github_classroom_session 字段
 
 <img src="https://user-images.githubusercontent.com/920487/179450068-c620e185-583f-4f83-a372-ee2c2825b805.png" alt="pat" width="400"/>
 
-#### 3 打开 workflow 开关
+### 3 打开 workflow 开关
 
 因为项目的 action 中有一个执行定时任务的 workflow， 需要手动开启。 该任务每小时会刷新一次排行榜数据。
 
@@ -42,45 +42,84 @@ b. 回到项目 setting 中， 把上一步获取的 **Personal access tokens** 
 
 [为什么需要手动打开 workflow](https://github.com/laravel/framework/issues/34356#issuecomment-718831832)
 
-#### 4. 配置 gh-pages
+### 4. 配置 gh-pages
 
 项目的 setting 中进行 pages 设置
 
 <img src="https://user-images.githubusercontent.com/920487/179375401-0d57b303-36c9-4599-88fd-0f4d93a095cd.png" alt="fork" width="600"/>
 
-#### 5. 修改配置
+### 5. 修改配置
 
 将 fork 的项目 clone 到本地，修改 **classroom.config.json**
 
-注意配置字段中 **org** 和 **classrooms** 是重要字段，决定数据采集的准确性，必须与实际信息保证一致。
-
-<img src="https://user-images.githubusercontent.com/108247373/179552983-c3807fbf-bcbf-4a24-9bf6-9116d6ca8137.png" alt="config" width="400"/>
-
-完整的 classroom 名称:
-
-<img src="https://user-images.githubusercontent.com/108247373/179397657-f8bbc0cf-958a-4edb-bf98-477591de013f.png" alt="config" width="200"/>
+```json
+    {
+        "org": "组织-必填",
+        "classrooms": [
+            {
+            "name": "教室名称-必填",
+            "assignments": [ "作业一", "作业二" ],
+            "studentBlacklist": ["黑名单"]
+            }
+        ],
+        "website": {
+            "title": "LOGO标题"
+        }
+    }
+```
 
 #### 配置字段说明
 
-| 字段       |        描述        | 是否必填 |
-| ---------- | :----------------: | -------: |
-| org        | classroom 所在组织 |       是 |
-| classrooms |        教室        |       是 |
-| website    |     站点元信息     |       否 |
+| 字段       |        描述        |                          类型 | 是否必填 |
+| ---------- | :----------------: | ----------------------------: | -------: |
+| org        | classroom 所在组织 |                        string |       是 |
+| classrooms |        教室        | [类型](#classroom-字段类型)[] |       是 |
+| website    |     站点元信息     |     [类型](#website-字段类型) |       否 |
 
-#### classrooms 内部字段
+#### classroom 字段类型
 
-| 字段             |                           描述                            | 是否必填 |
-| ---------------- | :-------------------------------------------------------: | -------: |
-| name             | 必须与实际信息一致，注意要求完整名称，包括 id，看下图说明 |       是 |
-| assignments      |         需要展示的作业排行榜，必须与实际信息一致          |       是 |
-| studentBlacklist |            黑名单，用于过滤不参加排名的的学生             |       否 |
+| 字段             |                                             描述                                              |                           类型 | 是否必填 |
+| ---------------- | :-------------------------------------------------------------------------------------------: | -----------------------------: | -------: |
+| name             | 教室名称, 必须与实际信息一致，注意要求完整名称，包括 id，看[下图说明](#完整的-classroom-名称) |                         string |       是 |
+| assignments      |                           需要展示的作业排行榜，必须与实际信息一致                            | [类型](#assignment-字段类型)[] |       否 |
+| studentBlacklist |                              黑名单，用于过滤不参加排名的的学生                               |                                |       否 |
 
-#### website 内部字段
+#### assignment 字段类型
 
-| 字段  |        描述        | 是否必填 |
-| ----- | :----------------: | -------: |
-| title |  网站 logo 处名称  |       否 |
+| 字段 |           描述           |                       类型                       | 是否必填 |
+| ---- | :----------------------: | :----------------------------------------------: | -------: |
+| -    | 列出教室中参与排名的作业 | string[] 或 [Option](#assignment-配置参数类型)[] |       否 |
+
+#### assignment 配置参数类型
+
+类似于[babel](https://babeljs.io/docs/en/configuration)的插件化配置， 项目也支持对教室的 assignment 进行参数化配置。
+
+比如目前项目支持按**分支维度**进行更细分地排行。
+
+```json
+{
+  "assignments": ["learning-rust", { "branches": ["lab0", "lab1"] }]
+}
+```
+
+| 字段     |           描述           |   类型   | 是否必填 |
+| -------- | :----------------------: | :------: | -------: |
+| branches | 列出仓库中参与排行的分支 | string[] |       否 |
+| ...      |            -             |  - ｜ -  |
+
+#### website 字段类型
+
+| 字段  |            描述            | 是否必填 |
+| ----- | :------------------------: | -------: |
+| title |      网站 logo 处名称      |       否 |
 | ...   | 根据需要可后期开放其他字段 |        - |
 
-修改完成后 push 到 main 分支，会自动触发执行 action，等待几分钟后，便可以访问自己的排行榜页面了。
+#### 完整的 classroom 名称
+
+<img src="https://user-images.githubusercontent.com/108247373/179397657-f8bbc0cf-958a-4edb-bf98-477591de013f.png" alt="config" width="200"/>
+
+### 部署
+
+修改完配置后 push 到 main 分支，会自动触发执行 action，等待几分钟后，便可以访问自己的排行榜页面了。
+
+同时该项目设置了定时更新数据任务，每小时会执行一次，执行结束后，自动刷新页面内容.
