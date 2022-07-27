@@ -132,7 +132,7 @@ const Rank = ({ isMobile }: { isMobile?: boolean }) => {
           <ClassRankList
             isMobile={isMobile}
             latestUpdatedAt={latestUpdatedAt}
-            apiUseCount={apiUseCount}
+            apiUseCount={Number(apiUseCount)}
             classroom={findClassroom(treeNodeId)}
           />
         ) : (

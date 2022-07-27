@@ -3,7 +3,7 @@ import { Table, Tag, Button, Progress } from 'antd'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import type { ColumnsType } from 'antd/lib/table'
-import { orderBy, first, last } from 'lodash'
+import { orderBy } from 'lodash'
 import Icon from '../../components/Icon'
 import type { TAssignment, TStudentHomework } from './types'
 import Search, { ISearchProps } from './search'
@@ -38,6 +38,7 @@ const RankList = (props: IRankListProps) => {
   const [query, setQuery] = useState<Partial<ISearchProps>>({})
   const { treeNodeId } = props
 
+  // eslint-disable-next-line
   const [_assignmentId, branch] = treeNodeId.split(connector)
 
   const columns: ColumnsType<TStudentHomework> = useMemo(
