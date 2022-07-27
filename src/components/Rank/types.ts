@@ -49,6 +49,7 @@ type TRun = {
   head_branch: string
   html_url: string
   run_started_at: string
+  created_at: string
   update_at: string
   // jobs: IJob[]
 }
@@ -57,12 +58,14 @@ export interface IWorkflowInfo {
   branchName?: string
   commitCount: number
   hasSubmited?: boolean
+  isSuccess: boolean
+  firstSubmitedAt?: string
+  latestUpdatedAt?: string
   runs: TRun[]
   // latestRun?: TRun
   // latestRunJobs?: TJob[]
   autoGradingJob?: TJob
   executeTime?: string
-  isSuccess: boolean
   submission_timestamp: string
   points_awarded: string
   points_available: string

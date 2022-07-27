@@ -73,9 +73,10 @@ async function run() {
                     console.log('runs data is empty', branch.name)
                     return
                   }
+                  const hasSubmited = submitCommitCount > 0
                   let jobs = []
                   let autoGradingJob = undefined
-                  if (submitCommitCount) {
+                  if (hasSubmited) {
                     jobs = await api.getJobs(repoName, runs[0].id)
                     if (_.isEmpty(jobs)) {
                       console.log('jobs data is empty', branch.name)
@@ -87,15 +88,18 @@ async function run() {
                       return
                     }
                   }
-                  const isSuccess = submitCommitCount && autoGradingJob ? autoGradingJob.conclusion === 'success' : false
+                  const isSuccess = autoGradingJob && autoGradingJob ? autoGradingJob.conclusion === 'success' : false
+                  const latestRun = _.first(runs)
                   const firstRun = _.last(runs)
                   return {
                     branchName: branch.name,
                     commitCount: submitCommitCount,
-                    hasSubmited: submitCommitCount > 0,
                     runs,
                     autoGradingJob,
+                    hasSubmited,
                     isSuccess,
+                    firstSubmitedAt: hasSubmited && firstRun ? firstRun.run_started_at : '',
+                    latestUpdatedAt: hasSubmited && latestRun ? latestRun.run_started_at : '',
                     executeTime: autoGradingJob
                       ? dayjs(autoGradingJob.completed_at).diff(
                           autoGradingJob.started_at,

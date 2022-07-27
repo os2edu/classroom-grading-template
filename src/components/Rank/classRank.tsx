@@ -12,6 +12,7 @@ interface IProps {
   classroom?: TClassroom
   isMobile?: boolean
   latestUpdatedAt?: string
+  apiUseCount?: number
 }
 
 interface IDatasource {
@@ -232,14 +233,22 @@ const ClassRoomRank = (props: IProps) => {
         {props.isMobile ? (
           <Icon symbol="icon-autoupdate" onClick={showUpdatetime} />
         ) : (
-          <span className="update-time">
-            最新数据更新时间:
-            {props.latestUpdatedAt && (
-              <span style={{ marginLeft: 10, fontWeight: 'bold' }}>
-                {dayjs(props.latestUpdatedAt).format('YYYY-MM-DD HH:mm::ss')}
-              </span>
-            )}
-          </span>
+          <div>
+            <span style={{ marginRight: 10 }}>
+              Github API 调用次数:
+              {props.apiUseCount && (
+                <span style={{ marginLeft: 10, fontWeight: 'bold' }}>{props.apiUseCount}</span>
+              )}
+            </span>
+            <span className="update-time">
+              最新数据更新时间:
+              {props.latestUpdatedAt && (
+                <span style={{ marginLeft: 10, fontWeight: 'bold' }}>
+                  {dayjs(props.latestUpdatedAt).format('YYYY-MM-DD HH:mm::ss')}
+                </span>
+              )}
+            </span>
+          </div>
         )}
       </div>
       {props.isMobile ? (
