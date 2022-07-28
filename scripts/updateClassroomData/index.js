@@ -75,9 +75,12 @@ async function run() {
                   }
                   const hasSubmited = submitCommitCount > 0
                   let jobs = []
-                  let autoGradingJob = undefined
-                  if (hasSubmited) {
-                    jobs = await api.getJobs(repoName, runs[0].id)
+                  let autoGradingJob = null
+                  const latestRun = _.find(runs, run => run.conclusion !== 'cancelled')
+                  const firstSuccessRun = _.findLast(runs, run => run.conclusion === 'success')
+                  const firstRun = _.last(runs)
+                  if (hasSubmited && latestRun) {
+                    jobs = await api.getJobs(repoName, latestRun.id)
                     if (_.isEmpty(jobs)) {
                       console.log('jobs data is empty', branch.name)
                       return
@@ -89,9 +92,6 @@ async function run() {
                     }
                   }
                   const isSuccess = autoGradingJob && autoGradingJob ? autoGradingJob.conclusion === 'success' : false
-                  const latestRun = _.first(runs)
-                  const firstSuccessRun = _.find(runs, run => run.conclusion === 'success')
-                  const firstRun = _.last(runs)
                   return {
                     branchName: branch.name,
                     commitCount: submitCommitCount,
@@ -100,18 +100,18 @@ async function run() {
                     hasSubmited,
                     isSuccess,
                     firstSubmitedAt: hasSubmited && firstRun ? firstRun.run_started_at : '',
-                    firstSuccessAt: hasSubmited && firstSuccessRun ? firstRun.run_started_at : '',
-                    latestUpdatedAt: hasSubmited && latestRun ? latestRun.run_started_at : '',
-                    executeTime: autoGradingJob
-                      ? dayjs(autoGradingJob.completed_at).diff(
-                          autoGradingJob.started_at,
+                    firstSuccessAt: hasSubmited && firstSuccessRun ? firstSuccessRun.created_at : '',
+                    latestUpdatedAt: hasSubmited && latestRun ? latestRun.created_at : '',
+                    executeTime: latestRun
+                      ? dayjs(latestRun.updated_at).diff(
+                          latestRun.run_started_at,
                           'second',
                           true
                         )
                       : null,
                     submission_timestamp: submitCommitCount && firstRun ? firstRun.created_at : '',
                     points_awarded: isSuccess ? '100' : '0',
-                    points_available: submitCommitCount && firstRun ? '100' : '0'
+                    points_available: latestRun ? '100' : '0'
                   }
                 })
               )

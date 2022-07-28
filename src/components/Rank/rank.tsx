@@ -103,7 +103,7 @@ const RankList = (props: IRankListProps) => {
         }
       },
       {
-        title: '状态',
+        title: '最新提交状态',
         align: 'center',
         width: 100,
         dataIndex: 'points_available',
@@ -175,7 +175,7 @@ const RankList = (props: IRankListProps) => {
         }
       },
       {
-        title: '第一次成功时间',
+        title: '首次成功时间',
         align: 'center',
         width: 150,
         dataIndex: 'firstSuccessAt',
@@ -191,7 +191,7 @@ const RankList = (props: IRankListProps) => {
         title: 'Action',
         align: 'center',
         dataIndex: 'actions',
-        width: 100,
+        width: 80,
         key: 'actions',
         render(_text: never, record: TStudentHomework) {
           if (!record.hasSubmited) {
@@ -213,7 +213,7 @@ const RankList = (props: IRankListProps) => {
       {
         title: '仓库',
         align: 'center',
-        width: 100,
+        width: 50,
         dataIndex: 'operate',
         key: 'operate',
         render(_text: any, record: TStudentHomework) {
