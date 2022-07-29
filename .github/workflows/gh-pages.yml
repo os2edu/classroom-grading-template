@@ -31,13 +31,13 @@ jobs:
         run: yarn setup
       - name: build pages
         run: yarn build
-      # - name: save data files
-      #   run: |
-      #     git config user.name Faith
-      #     git config user.email seventanyb@gmail.com
-      #     git add .
-      #     git commit -am "updata data"
-      #     git push origin main
+      - name: save data files
+        run: |
+          git config user.name Faith
+          git config user.email seventanyb@gmail.com
+          git add .
+          git commit -am "updata"
+          git push origin main
       - name: GitHub Pages
         uses: crazy-max/ghaction-github-pages@v3.0.0
         with:

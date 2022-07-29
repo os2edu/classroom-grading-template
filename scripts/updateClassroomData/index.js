@@ -8,6 +8,7 @@ require('dotenv').config()
 const { fetchAssignments } = require('./assignments')
 const { GitHubAPI } = require('./githubAPI')
 const config = require('../../classroom.config.json')
+const currentData = require('../../src/data.json')
 
 const userCache = {}
 // const workflowCache = {}
@@ -28,10 +29,10 @@ async function run() {
   const parseAssignments = async (classroom, assignments) => {
     return Promise.all(
       _.map(assignments, async (assignmentItem) => {
-        assignmentItem =[].concat(assignmentItem)
+        assignmentItem = [].concat(assignmentItem)
         const assignment = _.first(assignmentItem)
         const options = assignmentItem[1] || {}
-        if(!assignment) {
+        if (!assignment) {
           throw new Error('assignment config wrong!')
         }
         const repos = await fetchAssignments(classroom, assignment, process.env.SESSION_TOKEN)
@@ -61,7 +62,11 @@ async function run() {
               const runs = await api.getWorkflowRuns(repoName, classroomWorkflowId)
               const runGroup = _.groupBy(runs, 'head_branch')
               branches = await Promise.all(
-                _.filter(branchesOfRepo, br => br.name === repoDetail.default_branch || _.includes(options.branches, br.name)).map(async (branch) => {
+                _.filter(
+                  branchesOfRepo,
+                  (br) =>
+                    br.name === repoDetail.default_branch || _.includes(options.branches, br.name)
+                ).map(async (branch) => {
                   let runs = runGroup[branch.name]
                   const submitCommitCount = _.filter(runs, (run) => {
                     if (run.triggering_actor) {
@@ -76,8 +81,8 @@ async function run() {
                   const hasSubmited = submitCommitCount > 0
                   let jobs = []
                   let autoGradingJob = null
-                  const latestRun = _.find(runs, run => run.conclusion !== 'cancelled')
-                  const firstSuccessRun = _.findLast(runs, run => run.conclusion === 'success')
+                  const latestRun = _.find(runs, (run) => run.conclusion !== 'cancelled')
+                  const firstSuccessRun = _.findLast(runs, (run) => run.conclusion === 'success')
                   const firstRun = _.last(runs)
                   if (hasSubmited && latestRun) {
                     jobs = await api.getJobs(repoName, latestRun.id)
@@ -91,23 +96,23 @@ async function run() {
                       return
                     }
                   }
-                  const isSuccess = autoGradingJob && autoGradingJob ? autoGradingJob.conclusion === 'success' : false
+                  const isSuccess =
+                    autoGradingJob && autoGradingJob
+                      ? autoGradingJob.conclusion === 'success'
+                      : false
                   return {
                     branchName: branch.name,
                     commitCount: submitCommitCount,
-                    runs,
+                    // runs,
                     autoGradingJob,
                     hasSubmited,
                     isSuccess,
                     firstSubmitedAt: hasSubmited && firstRun ? firstRun.run_started_at : '',
-                    firstSuccessAt: hasSubmited && firstSuccessRun ? firstSuccessRun.created_at : '',
+                    firstSuccessAt:
+                      hasSubmited && firstSuccessRun ? firstSuccessRun.created_at : '',
                     latestUpdatedAt: hasSubmited && latestRun ? latestRun.created_at : '',
                     executeTime: latestRun
-                      ? dayjs(latestRun.updated_at).diff(
-                          latestRun.run_started_at,
-                          'second',
-                          true
-                        )
+                      ? dayjs(latestRun.updated_at).diff(latestRun.run_started_at, 'second', true)
                       : null,
                     submission_timestamp: submitCommitCount && firstRun ? firstRun.created_at : '',
                     points_awarded: isSuccess ? '100' : '0',
@@ -117,10 +122,9 @@ async function run() {
               )
             }
 
-            branches = branches.filter(br => !_.isEmpty(br))
-            const defaultBranchIndex = (branches).findIndex(
-              (branch) => branch.branchName === repoDetail.default_branch
-            ) || 0
+            branches = branches.filter((br) => !_.isEmpty(br))
+            const defaultBranchIndex =
+              branches.findIndex((branch) => branch.branchName === repoDetail.default_branch) || 0
 
             const defaultBranch = branches.splice(defaultBranchIndex, 1)[0] || {}
 
@@ -132,7 +136,7 @@ async function run() {
               repoURL: repoDetail.html_url,
               languages: [].concat(repo.language || []),
               ...defaultBranch,
-              branches,
+              branches
             }
           })
         )
@@ -146,22 +150,108 @@ async function run() {
     )
   }
 
+  /**
+   * 获取教室下一次要更新的作业
+   */
+  const getUpdateAssignments = (classroomConfig) => {
+    const idx = currentData.classrooms.findIndex(
+      (classroom) => classroom.id === classroomConfig.name
+    )
+    let updateAssignments = []
+    if (idx > -1) {
+      const currentClassroomData = currentData.classrooms[idx]
+      if (currentClassroomData.lastUpdateAssignment) {
+        const lastUpdateIdx = _.findIndex(
+          currentClassroomData.assignments,
+          (assigment) => assigment.title === currentClassroomData.lastUpdateAssignment
+        )
+        if (lastUpdateIdx > -1) {
+          const endIndex = lastUpdateIdx + 1 + classroomConfig.updateStep
+          updateAssignments = classroomConfig.assignments.slice(lastUpdateIdx + 1, endIndex)
+          const overIndex = endIndex - classroomConfig.assignments.length
+          if (overIndex > 0) {
+            updateAssignments = updateAssignments.concat(
+              classroomConfig.assignments.slice(0, overIndex)
+            )
+          }
+        }
+      } else {
+        updateAssignments = classroomConfig.assignments.slice(0, classroomConfig.updateStep)
+      }
+    } else {
+      updateAssignments = classroomConfig.assignments.slice(0, classroomConfig.updateStep)
+    }
+
+    return updateAssignments
+  }
+  /**
+   * 局部刷新数据
+   */
+  const parsePartialAssigments = async (classroomFullName, classroomConfig, title) => {
+    if (classroomConfig.assignments.length < classroomConfig.updateStep) {
+      throw new Error('updateStep cannot less than assigment count!')
+    }
+
+    const updateAssignments = getUpdateAssignments(classroomConfig)
+    console.log('partial parse assignments: ', updateAssignments);
+
+    const idx = currentData.classrooms.findIndex(
+      (classroom) => classroom.id === classroomConfig.name
+    )
+    if (idx > -1) {
+      const newAssignments = await parseAssignments(classroomFullName, updateAssignments)
+      _.forEach(newAssignments, (newAssignment) => {
+        const assignmentIdx = _.findIndex(
+          currentData.classrooms[idx].assignments,
+          (item) => item.id === newAssignment.id
+        )
+        if (assignmentIdx > -1) {
+          currentData.classrooms[idx].assignments[assignmentIdx] = newAssignment
+        } else {
+          currentData.classrooms[idx].assignments = (
+            currentData.classrooms[idx].assignments || []
+          ).concat(newAssignment)
+        }
+      })
+
+      // fs.writeFileSync('./test.json', JSON.stringify(newAssignments))
+      currentData.classrooms[idx].lastUpdateAssignment = _.first(
+        [].concat(_.last(updateAssignments))
+      )
+      return currentData.classrooms[idx]
+    } else {
+      return {
+        title,
+        id: classroomFullName,
+        desc: classroomConfig.desc || '',
+        lastUpdateAssignment: _.first([].concat(_.last(updateAssignments))),
+        assignments: await parseAssignments(classroomFullName, updateAssignments)
+      }
+    }
+  }
+
   const classrooms = await Promise.all(
     _.map(parseClassrooms, async (classroomConfig) => {
-      const classroomStr = classroomConfig.name || classroomConfig.title
-      const id = classroomStr.split('-', 1)[0]
+      const classroomFullName = classroomConfig.name || classroomConfig.title
+
+      const id = classroomFullName.split('-', 1)[0]
       if (!id) {
-        console.log(`${classroomStr} setting wrong, do again after checked!`)
+        console.log(`${classroomFullName} setting wrong, do again after checked!`)
         return
       }
 
-      const classroomName = classroomStr.slice(id.length + 1)
+      const classroomName = classroomFullName.slice(id.length + 1)
       const title = classroomName.split('-classroom')[0]
+
+      if (_.isNumber(classroomConfig.updateStep)) {
+        return await parsePartialAssigments(classroomFullName, classroomConfig, title)
+      }
+
       return {
         title,
-        id: classroomStr,
+        id: classroomFullName,
         desc: classroomConfig.desc || '',
-        assignments: await parseAssignments(classroomStr, classroomConfig.assignments)
+        assignments: await parseAssignments(classroomFullName, classroomConfig.assignments)
       }
     })
   )
@@ -169,7 +259,10 @@ async function run() {
   // fs.writeFileSync('./scripts/cache/user.json', JSON.stringify(userCache))
   // fs.writeFileSync('./scripts/cache/workflow.json', JSON.stringify(workflowCache))
   console.log('api use count: ', api.count)
-  fs.writeFileSync('./src/data.json', JSON.stringify({ classrooms, latest_updated_at: new Date(), apiUseCount: api.count }))
+  fs.writeFileSync(
+    './src/data.json',
+    JSON.stringify({ classrooms, latest_updated_at: new Date(), apiUseCount: api.count })
+  )
 }
 
 run()
