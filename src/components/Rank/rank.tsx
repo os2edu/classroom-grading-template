@@ -74,11 +74,10 @@ const RankList = (props: IRankListProps) => {
         fixed: true,
         width: 120,
         dataIndex: 'name',
-        className: 'top-three',
         render(text: string, record: TStudentHomework) {
           return (
             <span
-              className="link student-info"
+              className={`link student-info ${record.rank && record.rank < 4 ? 'top-three' : '' }`}
               onClick={() => window.open(`https://github.com/${text}`)}
             >
               {record.studentInfo.avatar_url && (
@@ -96,10 +95,9 @@ const RankList = (props: IRankListProps) => {
         align: 'center',
         width: 100,
         dataIndex: 'points_awarded',
-        className: 'top-three',
         key: 'score',
         render(text, record: TStudentHomework) {
-          return record.hasSubmited ? text : '-'
+          return record.hasSubmited ? <span className={`${record.rank && record.rank < 4 ? 'top-three' : ''}`}> {text} </span> : '-'
         }
       },
       {

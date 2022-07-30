@@ -60,13 +60,12 @@ const ClassRoomRank = (props: IProps) => {
         align: 'center',
         dataIndex: 'name',
         fixed: true,
-        className: 'top-three',
         width: 150,
         key: 'repoOwner',
         render(text: string, record: IDatasource) {
           return (
             <span
-              className="link student-info"
+              className={`link student-info ${record.rank && record.rank < 4 ? 'top-three' : '' }`}
               onClick={() => window.open(`https://github.com/${text}`)}
             >
               {record.avatar && <img src={record.avatar} alt="avatar" />}
@@ -83,8 +82,10 @@ const ClassRoomRank = (props: IProps) => {
         width: 100,
         fixed: true,
         dataIndex: 'averageScore',
-        className: 'top-three',
-        key: 'averageScore'
+        key: 'averageScore',
+        render(text, record) {
+          return <span className={`${record.rank && record.rank < 4 ? 'top-three' : ''}`}>{text}</span>
+        }
       },
       ...(map(props.classroom?.assignments, (item: TAssignment) => {
         return {
