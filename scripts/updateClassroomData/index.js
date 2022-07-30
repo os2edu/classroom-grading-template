@@ -10,8 +10,14 @@ const { GitHubAPI } = require('./githubAPI')
 const config = require('../../classroom.config.json')
 const currentData = require('../../src/data.json')
 
+const dataJSONPath = './src/data.json'
 const userCache = {}
 // const workflowCache = {}
+
+// 兼容assignment为数组类型的情况
+const extractAssignmentName = (assignment) => {
+  return _.first([].concat(assignment))
+}
 
 async function run() {
   const parseClassrooms = config.classrooms
@@ -30,7 +36,7 @@ async function run() {
     return Promise.all(
       _.map(assignments, async (assignmentItem) => {
         assignmentItem = [].concat(assignmentItem)
-        const assignment = _.first(assignmentItem)
+        const assignment = assignmentItem[0]
         const options = assignmentItem[1] || {}
         if (!assignment) {
           throw new Error('assignment config wrong!')
@@ -163,7 +169,7 @@ async function run() {
       if (currentClassroomData.lastUpdateAssignment) {
         const lastUpdateIdx = _.findIndex(
           currentClassroomData.assignments,
-          (assigment) => assigment.title === currentClassroomData.lastUpdateAssignment
+          (assignment) => assignment.title === currentClassroomData.lastUpdateAssignment
         )
         if (lastUpdateIdx > -1) {
           const endIndex = lastUpdateIdx + 1 + classroomConfig.updateStep
@@ -187,13 +193,13 @@ async function run() {
   /**
    * 局部刷新数据
    */
-  const parsePartialAssigments = async (classroomFullName, classroomConfig, title) => {
+  const parsePartialAssignments = async (classroomFullName, classroomConfig, title) => {
     if (classroomConfig.assignments.length < classroomConfig.updateStep) {
-      throw new Error('updateStep cannot less than assigment count!')
+      throw new Error('updateStep cannot less than assignment count!')
     }
 
     const updateAssignments = getUpdateAssignments(classroomConfig)
-    console.log('partial parse assignments: ', updateAssignments);
+    console.log('partial parse assignments: ', updateAssignments)
 
     const idx = currentData.classrooms.findIndex(
       (classroom) => classroom.id === classroomConfig.name
@@ -214,9 +220,8 @@ async function run() {
         }
       })
 
-      // fs.writeFileSync('./test.json', JSON.stringify(newAssignments))
-      currentData.classrooms[idx].lastUpdateAssignment = _.first(
-        [].concat(_.last(updateAssignments))
+      currentData.classrooms[idx].lastUpdateAssignment = extractAssignmentName(
+        _.last(updateAssignments)
       )
       return currentData.classrooms[idx]
     } else {
@@ -224,14 +229,14 @@ async function run() {
         title,
         id: classroomFullName,
         desc: classroomConfig.desc || '',
-        lastUpdateAssignment: _.first([].concat(_.last(updateAssignments))),
+        lastUpdateAssignment: extractAssignmentName(_.last(updateAssignments)),
         assignments: await parseAssignments(classroomFullName, updateAssignments)
       }
     }
   }
 
-  const classrooms = await Promise.all(
-    _.map(parseClassrooms, async (classroomConfig) => {
+  const updateClassroomsData = (parseClassrooms) => {
+    return _.map(parseClassrooms, async (classroomConfig) => {
       const classroomFullName = classroomConfig.name || classroomConfig.title
 
       const id = classroomFullName.split('-', 1)[0]
@@ -243,8 +248,9 @@ async function run() {
       const classroomName = classroomFullName.slice(id.length + 1)
       const title = classroomName.split('-classroom')[0]
 
+      // 每次只更新该教室的部分作业
       if (_.isNumber(classroomConfig.updateStep)) {
-        return await parsePartialAssigments(classroomFullName, classroomConfig, title)
+        return await parsePartialAssignments(classroomFullName, classroomConfig, title)
       }
 
       return {
@@ -254,15 +260,126 @@ async function run() {
         assignments: await parseAssignments(classroomFullName, classroomConfig.assignments)
       }
     })
-  )
+  }
+
+  const removeClassNameOfAssignment = (classroomName, assignmentId) => {
+    return assignmentId.split(classroomName + '-')[1]
+  }
+  const findNextUpdateAssignments = (lastUpdateAssignment) => {
+    const flattenAssignments = _.reduce(
+      config.classrooms,
+      (list, classroom) => {
+        const assignments = classroom.assignments.map(
+          (assignment) => classroom.name + '-' + extractAssignmentName(assignment)
+        )
+        return list.concat(assignments)
+      },
+      []
+    )
+    if (flattenAssignments.length < Number(config.updateStep)) {
+      console.log("updateStep cannot less than all classroom's assignment count!")
+      return []
+    }
+
+    const lastUpdateIdx = _.findIndex(
+      flattenAssignments,
+      (assignment) => assignment === lastUpdateAssignment
+    )
+
+    let updateAssignments = []
+    if (lastUpdateIdx > -1) {
+      const endIndex = lastUpdateIdx + 1 + config.updateStep
+      updateAssignments = flattenAssignments.slice(lastUpdateIdx + 1, endIndex)
+      const overIndex = endIndex - flattenAssignments.length
+      if (overIndex > 0) {
+        updateAssignments = updateAssignments.concat(flattenAssignments.slice(0, overIndex))
+      }
+    }
+
+    return updateAssignments
+  }
+
+  const getDefaultLastUpdateAssignment = () => {
+    const lastClassroom = _.last(parseClassrooms)
+    return lastClassroom.name + '-' + extractAssignmentName(_.last(lastClassroom.assignments))
+  }
+
+  // 每次只更新部分作业, 按顺序执行更新
+  if (_.isNumber(config.updateStep)) {
+    const lastUpdateAssignment =
+      currentData.lastUpdateAssignment || getDefaultLastUpdateAssignment()
+    console.log('last time update assigment is: ', lastUpdateAssignment)
+
+    const updateAssignments = findNextUpdateAssignments(lastUpdateAssignment)
+    console.log('will update these assignments: ', updateAssignments)
+    let partialParseClassrooms = [] // 更新部分教室作业数据
+    config.classrooms.forEach((classroom) => {
+      const assignmentsOfCurrentClassroom = updateAssignments.filter((assignment) =>
+        assignment.includes(classroom.name)
+      )
+      const needUpdateAssignments = assignmentsOfCurrentClassroom.map((assignment) =>
+        removeClassNameOfAssignment(classroom.name, assignment)
+      )
+      if (!_.isEmpty(assignmentsOfCurrentClassroom)) {
+        partialParseClassrooms.push({
+          ..._.omit(classroom, ['updateStep', 'assignments']),
+          assignments: classroom.assignments.filter((assignment) =>
+            needUpdateAssignments.includes(extractAssignmentName(assignment))
+          )
+        })
+      }
+    })
+    console.log('==============partialParseClassrooms==============')
+    console.log(partialParseClassrooms)
+    const updateClassrooms = await Promise.all(updateClassroomsData(partialParseClassrooms))
+
+    _.forEach(updateClassrooms, (cls) => {
+      const classroomIdx = _.findIndex(
+        currentData.classrooms,
+        (classroom) => classroom.id === cls.id
+      )
+      if (classroomIdx > -1) {
+        if (_.isEmpty(currentData.classrooms[classroomIdx].assignments)) {
+          currentData.classrooms[classroomIdx] = cls
+        } else {
+          _.forEach(cls.assignments, (assignment) => {
+            const oldAssignmentIdx = _.findIndex(
+              currentData.classrooms[classroomIdx].assignments,
+              (clsAssign) => clsAssign.id === assignment.id
+            )
+            if (oldAssignmentIdx > -1) {
+              currentData.classrooms[classroomIdx].assignments[oldAssignmentIdx] = assignment
+            } else {
+              currentData.classrooms[classroomIdx].assignments =
+                currentData.classrooms[classroomIdx].assignments.concat(assignment)
+            }
+          })
+        }
+      } else {
+        currentData.classrooms = (currentData.classrooms || []).concat(cls)
+      }
+    })
+
+    fs.writeFileSync(
+      dataJSONPath,
+      JSON.stringify({
+        classrooms: currentData.classrooms,
+        lastUpdateAssignment: _.last(updateAssignments),
+        latest_updated_at: new Date(),
+        apiUseCount: api.count
+      })
+    )
+  } else {
+    const classrooms = await Promise.all(updateClassroomsData(parseClassrooms))
+    fs.writeFileSync(
+      dataJSONPath,
+      JSON.stringify({ classrooms, latest_updated_at: new Date(), apiUseCount: api.count })
+    )
+  }
 
   // fs.writeFileSync('./scripts/cache/user.json', JSON.stringify(userCache))
   // fs.writeFileSync('./scripts/cache/workflow.json', JSON.stringify(workflowCache))
-  console.log('api use count: ', api.count)
-  fs.writeFileSync(
-    './src/data.json',
-    JSON.stringify({ classrooms, latest_updated_at: new Date(), apiUseCount: api.count })
-  )
+  console.log('total api use count: ', api.count)
 }
 
 run()
