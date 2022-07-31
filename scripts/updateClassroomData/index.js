@@ -86,7 +86,7 @@ async function run() {
               return
             }
 
-            let branchesOfRepo = [repoDetail.default_branch]
+            let branchesOfRepo = [{ name: repoDetail.default_branch }]
             if (options.branches) {
               branchesOfRepo = await api.getBranches(repoName)
             }
