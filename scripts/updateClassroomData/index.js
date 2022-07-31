@@ -32,38 +32,68 @@ async function run() {
     org: config.org
   })
 
+  const findCurrentAssignmentData = (classroom, assignment) => {
+    const currentClassroom = _.find(currentData.classrooms, (c) => c.id === classroom)
+    if (currentClassroom) {
+      return _.find(currentClassroom.assignments, (a) => a.title == assignment)
+    }
+  }
+
   const parseAssignments = async (classroom, assignments) => {
     return Promise.all(
       _.map(assignments, async (assignmentItem) => {
-        assignmentItem = [].concat(assignmentItem)
+        assignmentItem = [].concat(assignmentItem) // 适配字段的两种类型 1. string, 2. [string, options]
         const assignment = assignmentItem[0]
         const options = assignmentItem[1] || {}
         if (!assignment) {
           throw new Error('assignment config wrong!')
         }
         const repos = await fetchAssignments(classroom, assignment, process.env.SESSION_TOKEN)
+
+        const currentAssignment = findCurrentAssignmentData(classroom, assignment)
+        const currentAssignmentUserMap = {}
+        const currentAssignmentRepoMap = {}
+        const currentAssignmentWorkflowMap = {}
+
+        _.forEach(currentAssignment.student_repositories, (repo) => {
+          currentAssignmentUserMap[repo.name] = repo.studentInfo
+          if (repo.repo && repo.repo.name) {
+            currentAssignmentRepoMap[repo.repo.name] = repo.repo
+            if (repo.classroomWorkflowId) {
+              currentAssignmentWorkflowMap[repo.repo.name] = repo.classroomWorkflowId
+            }
+          }
+        })
+
         const student_repositories = await Promise.all(
           _.map(repos, async (repo) => {
             const studentName = repo.github_username
             const repoName = repo.student_repository_name
 
-            let studentInfo = userCache[studentName] || (await api.getUserInfo(studentName))
+            let studentInfo =
+              userCache[studentName] ||
+              currentAssignmentUserMap[studentName] ||
+              (await api.getUserInfo(studentName))
             if (studentInfo === 'NotFound') {
               studentInfo = {}
             } else {
               userCache[studentName] = studentInfo
             }
 
-            const repoDetail = await api.getRepo(repoName)
+            const repoDetail = currentAssignmentRepoMap[repoName] || (await api.getRepo(repoName))
             if (!repoDetail) {
               console.log(`this repo: ${repoName} parse wrong, in classroom: ${classroom}`)
               return
             }
 
-            const branchesOfRepo = await api.getBranches(repoName)
+            let branchesOfRepo = [repoDetail.default_branch]
+            if (options.branches) {
+              branchesOfRepo = await api.getBranches(repoName)
+            }
 
             let branches = []
-            const classroomWorkflowId = await api.getClassroomWorkflowId(repoName)
+            const classroomWorkflowId =
+              currentAssignmentWorkflowMap[repoName] || (await api.getClassroomWorkflowId(repoName))
             if (classroomWorkflowId) {
               const runs = await api.getWorkflowRuns(repoName, classroomWorkflowId)
               const runGroup = _.groupBy(runs, 'head_branch')
@@ -138,6 +168,7 @@ async function run() {
               name: studentName,
               avatar: studentInfo.avatar_url,
               studentInfo: studentInfo,
+              classroomWorkflowId,
               repo: repoDetail,
               repoURL: repoDetail.html_url,
               languages: [].concat(repo.language || []),
