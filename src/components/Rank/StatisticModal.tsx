@@ -55,9 +55,9 @@ const StatisticModal = (props: IProps) => {
     const C = assignment.student_repositories.filter(
       (repo) => repo.hasSubmited && !repo.isSuccess
     ).length
-    const passRate = `${Number((A / B).toFixed(3)) * 100}%`
-    const failRate = `${Number((C / B).toFixed(3)) * 100}%`
-    const doingRate = `${Number(((A + C) / B).toFixed(3)) * 100}%`
+    const passRate = `${((A / B) * 100).toFixed(2)}%`
+    const failRate = `${((C / B) * 100).toFixed(2)}%`
+    const doingRate = `${(((A + C) / B) * 100).toFixed(2)}%`
     return {
       key: assignment.id,
       title: assignment.title,
