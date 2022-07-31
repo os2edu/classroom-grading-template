@@ -12,6 +12,32 @@
   .classroom-tree-area {
     margin-right: @nav-gap;
     position: relative;
+    .ant-tree-node-content-wrapper {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 24px;
+
+      .ant-tree-title .icon {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-top: 1px;
+        font-size: 16px;
+        visibility: hidden;
+        cursor: pointer;
+        color: #c6c0b3;
+      }
+    }
+    .ant-tree-treenode-selected {
+      .ant-tree-node-content-wrapper .ant-tree-title .icon {
+        visibility: visible;
+        &:hover {
+          color: #fff;
+        }
+      }
+    }
     .fold-toggle {
       position: absolute;
       right: -@nav-gap;

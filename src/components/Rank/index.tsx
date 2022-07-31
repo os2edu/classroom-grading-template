@@ -65,16 +65,26 @@ const Rank = ({ isMobile }: { isMobile?: boolean }) => {
       title: item.title,
       key: item.id,
       isClass: true,
-      icon: <Icon symbol="icon-autozuoye1" />,
+      icon: <Icon symbol="icon-autolouyufangyuanshezhi" />,
       children: item.assignments.map((assignment) => {
         return {
-          title: assignment.title,
+          title: (
+            <>
+              {assignment.title}
+              <Icon symbol="icon-autofenxi" />
+            </>
+          ),
           key: assignment.id,
           icon: <Icon symbol="icon-autowj-rz" />,
           isLeaf: isEmpty(assignment.branches),
           children: map(assignment.branches, (br) => {
             return {
-              title: br,
+              title: (
+                <>
+                  {br}
+                  <Icon symbol="icon-autofenxi" />
+                </>
+              ),
               key: `${assignment.id}${connector}${br}`,
               icon: <Icon symbol="icon-autobranches" />,
               isLeaf: true
