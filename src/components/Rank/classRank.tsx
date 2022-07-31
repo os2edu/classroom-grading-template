@@ -7,6 +7,7 @@ import type { ColumnsType } from 'antd/lib/table'
 import type { TClassroom, TAssignment, TStudentHomework } from './types'
 import Search, { ISearchProps } from './search'
 import AssignmentBar from './assignmentBar'
+import { AvatarInfo, MobileAvatarInfo } from './AvatarInfo'
 
 interface IProps {
   classroom?: TClassroom
@@ -63,17 +64,7 @@ const ClassRoomRank = (props: IProps) => {
         width: 150,
         key: 'repoOwner',
         render(text: string, record: IDatasource) {
-          return (
-            <span
-              className={`link student-info ${record.rank && record.rank < 4 ? 'top-three' : '' }`}
-              onClick={() => window.open(`https://github.com/${text}`)}
-            >
-              {record.avatar && <img src={record.avatar} alt="avatar" />}
-              <span title={text} className="student-info-name">
-                {text}
-              </span>
-            </span>
-          )
+          return <AvatarInfo rank={record.rank} avatarURL={record.avatar} name={text} />
         }
       },
       {
@@ -84,7 +75,9 @@ const ClassRoomRank = (props: IProps) => {
         dataIndex: 'averageScore',
         key: 'averageScore',
         render(text, record) {
-          return <span className={`${record.rank && record.rank < 4 ? 'top-three' : ''}`}>{text}</span>
+          return (
+            <span className={`${record.rank && record.rank < 4 ? 'top-three' : ''}`}>{text}</span>
+          )
         }
       },
       ...(map(props.classroom?.assignments, (item: TAssignment) => {
@@ -162,17 +155,16 @@ const ClassRoomRank = (props: IProps) => {
               key={item.name + item.rank}
             >
               <span className="list-order-index">{item.rank}</span>
-              <span
-                className="info-avartar"
-                onClick={() => window.open(`https://github.com/${item.name}`)}
-              >
+              <span className="info-avartar">
                 {(item.rank || 1000) <= 3 && (
                   <Icon className="order-hat" symbol="icon-autorexiao-huangguan" />
                 )}
-                <img src={item.avatar} alt="avatar" />
+                <MobileAvatarInfo avatarURL={item.avatar} name={item.name} />
               </span>
               <div className="rank-info">
-                <span>{item.name}</span>
+                <span onClick={() => window.open(`https://github.com/${item.name}`)}>
+                  {item.name}
+                </span>
                 <div className="rank-homeworks">
                   {map(props.classroom?.assignments, (assigment: TAssignment) => {
                     const homework = item.homeworks.find(({ repoURL }) =>

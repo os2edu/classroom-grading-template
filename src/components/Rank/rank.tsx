@@ -8,6 +8,7 @@ import Icon from '../../components/Icon'
 import type { TAssignment, TStudentHomework } from './types'
 import Search, { ISearchProps } from './search'
 import { connector } from '.'
+import { AvatarInfo, MobileAvatarInfo } from './AvatarInfo'
 
 // const languageColorArra = [
 //   'red',
@@ -25,7 +26,7 @@ import { connector } from '.'
 dayjs.extend(relativeTime)
 
 const sortBoolean = (key: keyof TStudentHomework) => {
-  return (a: TStudentHomework) => a[key] ? -1 : 1
+  return (a: TStudentHomework) => (a[key] ? -1 : 1)
 }
 
 interface IRankListProps {
@@ -76,17 +77,7 @@ const RankList = (props: IRankListProps) => {
         dataIndex: 'name',
         render(text: string, record: TStudentHomework) {
           return (
-            <span
-              className={`link student-info ${record.rank && record.rank < 4 ? 'top-three' : '' }`}
-              onClick={() => window.open(`https://github.com/${text}`)}
-            >
-              {record.studentInfo.avatar_url && (
-                <img src={record.studentInfo.avatar_url} alt="avatar" />
-              )}
-              <span title={text} className="student-info-name">
-                {text}
-              </span>
-            </span>
+            <AvatarInfo rank={record.rank} avatarURL={record.studentInfo.avatar_url} name={text} />
           )
         }
       },
@@ -97,7 +88,11 @@ const RankList = (props: IRankListProps) => {
         dataIndex: 'points_awarded',
         key: 'score',
         render(text, record: TStudentHomework) {
-          return record.hasSubmited ? <span className={`${record.rank && record.rank < 4 ? 'top-three' : ''}`}> {text} </span> : '-'
+          return record.hasSubmited ? (
+            <span className={`${record.rank && record.rank < 4 ? 'top-three' : ''}`}> {text} </span>
+          ) : (
+            '-'
+          )
         }
       },
       {
@@ -380,17 +375,19 @@ const RankList = (props: IRankListProps) => {
               key={item.name + item.rank}
             >
               <span className="list-order-index">{item.rank}</span>
-              <span
-                className="info-avartar"
-                onClick={() => window.open(`https://github.com/${item.name}`)}
-              >
+              <span className="info-avartar">
                 {(item.rank || 1000) <= 3 && (
                   <Icon className="order-hat" symbol="icon-autorexiao-huangguan" />
                 )}
-                <img src={item.studentInfo.avatar_url} alt="avatar" />
+                <MobileAvatarInfo avatarURL={item.studentInfo.avatar_url} name={item.name} />
               </span>
               <div className="rank-info rank-info-more">
-                <span className="rank-info-name">{item.name}</span>
+                <span
+                  className="rank-info-name"
+                  onClick={() => window.open(`https://github.com/${item.name}`)}
+                >
+                  {item.name}
+                </span>
                 <span className="rank-info-status">
                   {item.hasSubmited ? renderStatus(item) : '-'}
                 </span>
