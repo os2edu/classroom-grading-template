@@ -8,6 +8,7 @@ import { TAssignment, TClassroom, IWorkflowInfo, TStudentHomework } from './type
 import data from '../../data.json'
 import MobileNav from './mobileNav'
 import Icon from '../Icon'
+import StatisticModal from './StatisticModal'
 
 import './index.less'
 
@@ -60,31 +61,31 @@ const defaultSelectedClass = classroomData?.[0]?.id
 const Rank = ({ isMobile }: { isMobile?: boolean }) => {
   const navRef = React.useRef<{ changeVisible: (visible: boolean) => void }>()
   const [hideNav, setHideNav] = useState(true)
+  const [statisticVisible, setStatisticVisible] = useState(false)
+
+  const renderAssignmentTitle = (title: string) => {
+    return (
+      <>
+        {title}
+        <Icon symbol="icon-autofenxi" onClick={() => setStatisticVisible(true)} />
+      </>
+    )
+  }
   const treeData: DataNode[] = classroomData.map((item) => {
     return {
-      title: item.title,
+      title: renderAssignmentTitle(item.title),
       key: item.id,
       isClass: true,
       icon: <Icon symbol="icon-autolouyufangyuanshezhi" />,
       children: item.assignments.map((assignment) => {
         return {
-          title: (
-            <>
-              {assignment.title}
-              <Icon symbol="icon-autofenxi" />
-            </>
-          ),
+          title: assignment.title,
           key: assignment.id,
           icon: <Icon symbol="icon-autowj-rz" />,
           isLeaf: isEmpty(assignment.branches),
           children: map(assignment.branches, (br) => {
             return {
-              title: (
-                <>
-                  {br}
-                  <Icon symbol="icon-autofenxi" />
-                </>
-              ),
+              title: br,
               key: `${assignment.id}${connector}${br}`,
               icon: <Icon symbol="icon-autobranches" />,
               isLeaf: true
@@ -134,6 +135,11 @@ const Rank = ({ isMobile }: { isMobile?: boolean }) => {
             defaultExpandAll
             onSelect={onSelect}
             treeData={treeData}
+          />
+          <StatisticModal
+            classroom={isClassNode ? findClassroom(treeNodeId) : undefined}
+            visible={statisticVisible}
+            onCancel={() => setStatisticVisible(false)}
           />
         </div>
       )}
