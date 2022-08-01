@@ -8,6 +8,7 @@ import type { TClassroom, TAssignment, TStudentHomework } from './types'
 import Search, { ISearchProps } from './search'
 import AssignmentBar from './assignmentBar'
 import { AvatarInfo, MobileAvatarInfo } from './AvatarInfo'
+import StatisticModal from './StatisticModal'
 
 interface IProps {
   classroom?: TClassroom
@@ -26,6 +27,7 @@ interface IDatasource {
 }
 
 const ClassRoomRank = (props: IProps) => {
+  const [statisticVisible, setStatisticVisible] = useState(false)
   const [query, setQuery] = useState<Partial<ISearchProps>>({})
 
   const classroomId = props.classroom?.id
@@ -226,22 +228,30 @@ const ClassRoomRank = (props: IProps) => {
         {props.isMobile ? (
           <Icon symbol="icon-autoupdate" onClick={showUpdatetime} />
         ) : (
-          <div>
-            <span style={{ marginRight: 10 }}>
-              Github API 调用次数:
-              {props.apiUseCount && (
-                <span style={{ marginLeft: 10, fontWeight: 'bold' }}>{props.apiUseCount}</span>
-              )}
-            </span>
-            <span className="update-time">
-              最新数据更新时间:
-              {props.latestUpdatedAt && (
-                <span style={{ marginLeft: 10, fontWeight: 'bold' }}>
-                  {dayjs(props.latestUpdatedAt).format('YYYY-MM-DD HH:mm::ss')}
-                </span>
-              )}
-            </span>
-          </div>
+          <>
+            <div className="rest-middle-area">
+              <div className="statistic-wrap" onClick={() => setStatisticVisible(true)}>
+                <Icon symbol="icon-autofenxi" />
+                <span>数据分析</span>
+              </div>
+            </div>
+            <div>
+              <span style={{ marginRight: 10 }}>
+                Github API 调用次数:
+                {props.apiUseCount && (
+                  <span style={{ marginLeft: 10, fontWeight: 'bold' }}>{props.apiUseCount}</span>
+                )}
+              </span>
+              <span className="update-time">
+                最新数据更新时间:
+                {props.latestUpdatedAt && (
+                  <span style={{ marginLeft: 10, fontWeight: 'bold' }}>
+                    {dayjs(props.latestUpdatedAt).format('YYYY-MM-DD HH:mm::ss')}
+                  </span>
+                )}
+              </span>
+            </div>
+          </>
         )}
       </div>
       {props.isMobile ? (
@@ -256,6 +266,11 @@ const ClassRoomRank = (props: IProps) => {
           size="middle"
         />
       )}
+      <StatisticModal
+        classroom={props.classroom}
+        visible={statisticVisible}
+        onCancel={() => setStatisticVisible(false)}
+      />
     </>
   )
 }

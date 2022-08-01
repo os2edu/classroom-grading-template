@@ -16,26 +16,9 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      padding-right: 24px;
 
-      .ant-tree-title .icon {
-        position: absolute;
-        right: 8px;
-        top: 50%;
-        transform: translateY(-50%);
-        margin-top: 1px;
+      svg.icon {
         font-size: 16px;
-        visibility: hidden;
-        cursor: pointer;
-        color: #c6c0b3;
-      }
-    }
-    .ant-tree-treenode-selected {
-      .ant-tree-node-content-wrapper .ant-tree-title .icon {
-        visibility: visible;
-        &:hover {
-          color: #fff;
-        }
       }
     }
     .fold-toggle {
@@ -326,4 +309,24 @@
   justify-content: space-between;
   margin-bottom: 20px;
   position: relative;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  color: #515767;
+  .rest-middle-area {
+    flex: 1;
+    margin: 0 16px;
+    .statistic-wrap {
+      display: inline-block;
+      font-size: 14px;
+      cursor: pointer;
+      &:hover {
+        color: #007fff;
+      }
+      .icon {
+        margin-right: 4px;
+        font-size: 16px;
+      }
+    }
+  }
 }

@@ -116,8 +116,8 @@ const StatisticModal = (props: IProps) => {
   })
 
   return (
-    <Modal title={`排行榜数据统计分析(${props.classroom?.title})`} width={'90%'} {...props}>
-      <Table scroll={{ x: 1080 }} dataSource={dataSource} columns={columns} />
+    <Modal title={`排行榜数据统计分析(${props.classroom?.title})`} width={'90%'} footer={null} {...props} >
+          <Table scroll={{ x: 1080 }} dataSource={dataSource} columns={columns} />
     </Modal>
   )
 }

@@ -8,7 +8,6 @@ import { TAssignment, TClassroom, IWorkflowInfo, TStudentHomework } from './type
 import data from '../../data.json'
 import MobileNav from './mobileNav'
 import Icon from '../Icon'
-import StatisticModal from './StatisticModal'
 
 import './index.less'
 
@@ -61,19 +60,10 @@ const defaultSelectedClass = classroomData?.[0]?.id
 const Rank = ({ isMobile }: { isMobile?: boolean }) => {
   const navRef = React.useRef<{ changeVisible: (visible: boolean) => void }>()
   const [hideNav, setHideNav] = useState(true)
-  const [statisticVisible, setStatisticVisible] = useState(false)
 
-  const renderAssignmentTitle = (title: string) => {
-    return (
-      <>
-        {title}
-        <Icon symbol="icon-autofenxi" onClick={() => setStatisticVisible(true)} />
-      </>
-    )
-  }
   const treeData: DataNode[] = classroomData.map((item) => {
     return {
-      title: renderAssignmentTitle(item.title),
+      title: item.title,
       key: item.id,
       isClass: true,
       icon: <Icon symbol="icon-autolouyufangyuanshezhi" />,
@@ -135,11 +125,6 @@ const Rank = ({ isMobile }: { isMobile?: boolean }) => {
             defaultExpandAll
             onSelect={onSelect}
             treeData={treeData}
-          />
-          <StatisticModal
-            classroom={isClassNode ? findClassroom(treeNodeId) : undefined}
-            visible={statisticVisible}
-            onCancel={() => setStatisticVisible(false)}
           />
         </div>
       )}
