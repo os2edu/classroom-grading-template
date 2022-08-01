@@ -34,7 +34,6 @@ export const MobileAvatarInfo = ({ name, avatarURL }: { name: string; avatarURL?
 export const AvatarInfo = ({ rank, avatarURL, name }: IProps) => {
   const showWechat = () => {
     const contact = (contactInfo as Record<string, any>)[name]
-    console.log(contact)
     if (contact && showEasterEgg()) {
       Modal.info({
         title: <span>微信号</span>,
