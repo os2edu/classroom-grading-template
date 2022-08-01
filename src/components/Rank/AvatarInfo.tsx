@@ -8,10 +8,18 @@ interface IProps {
   name: string
 }
 
+const CONFIRM_SALT = 'T1NUcmFpbmluZ0NhbXA='
+
+const showEasterEgg = () => {
+  const params = new URLSearchParams(window.location.search)
+  const easterEgg = params.get('easterEgg')
+  return easterEgg && btoa(easterEgg) === CONFIRM_SALT
+}
+
 export const MobileAvatarInfo = ({ name, avatarURL }: { name: string; avatarURL?: string }) => {
   const showWechat = () => {
     const contact = (contactInfo as Record<string, any>)[name]
-    if (contact) {
+    if (contact && showEasterEgg()) {
       Modal.info({
         centered: true,
         width: 260,
@@ -26,7 +34,8 @@ export const MobileAvatarInfo = ({ name, avatarURL }: { name: string; avatarURL?
 export const AvatarInfo = ({ rank, avatarURL, name }: IProps) => {
   const showWechat = () => {
     const contact = (contactInfo as Record<string, any>)[name]
-    if (contact) {
+    console.log(contact)
+    if (contact && showEasterEgg()) {
       Modal.info({
         title: <span>微信号</span>,
         content: contact.wechat
