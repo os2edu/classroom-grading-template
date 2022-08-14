@@ -50,7 +50,7 @@ async function run() {
         }
         const repos = await fetchAssignments(classroom, assignment, process.env.SESSION_TOKEN)
 
-        const currentAssignment = findCurrentAssignmentData(classroom, assignment)
+        const currentAssignment = findCurrentAssignmentData(classroom, assignment) || {}
         const currentAssignmentUserMap = {}
         const currentAssignmentRepoMap = {}
         const currentAssignmentWorkflowMap = {}
